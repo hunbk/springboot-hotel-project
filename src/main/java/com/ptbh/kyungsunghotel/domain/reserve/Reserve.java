@@ -1,8 +1,8 @@
-package com.ptbh.kyungsunghotel.reserve;
+package com.ptbh.kyungsunghotel.domain.reserve;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.ptbh.kyungsunghotel.member.Member;
-import com.ptbh.kyungsunghotel.room.Room;
+import com.ptbh.kyungsunghotel.domain.member.Member;
+import com.ptbh.kyungsunghotel.domain.room.Room;
 import lombok.Builder;
 import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;

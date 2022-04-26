@@ -1,4 +1,4 @@
-package com.ptbh.kyungsunghotel.board;
+package com.ptbh.kyungsunghotel.domain.board;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

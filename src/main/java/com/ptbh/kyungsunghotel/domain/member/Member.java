@@ -1,8 +1,8 @@
 
-package com.ptbh.kyungsunghotel.member;
+package com.ptbh.kyungsunghotel.domain.member;
 
-import com.ptbh.kyungsunghotel.board.Board;
-import com.ptbh.kyungsunghotel.reserve.Reserve;
+import com.ptbh.kyungsunghotel.domain.board.Board;
+import com.ptbh.kyungsunghotel.domain.reserve.Reserve;
 import lombok.Builder;
 import lombok.Data;
 

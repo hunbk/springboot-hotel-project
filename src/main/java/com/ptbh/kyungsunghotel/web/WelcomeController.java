@@ -1,4 +1,4 @@
-package com.ptbh.kyungsunghotel.system;
+package com.ptbh.kyungsunghotel.web;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;

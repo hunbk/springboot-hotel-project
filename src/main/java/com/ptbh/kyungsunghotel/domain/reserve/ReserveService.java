@@ -1,4 +1,4 @@
-package com.ptbh.kyungsunghotel.reserve;
+package com.ptbh.kyungsunghotel.domain.reserve;
 
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;

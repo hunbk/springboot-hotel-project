@@ -1,4 +1,4 @@
-package com.ptbh.kyungsunghotel.member;
+package com.ptbh.kyungsunghotel.domain.member;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 

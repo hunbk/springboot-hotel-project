@@ -1,4 +1,4 @@
-package com.ptbh.kyungsunghotel.room;
+package com.ptbh.kyungsunghotel.domain.room;
 
 import lombok.Builder;
 import lombok.Data;
