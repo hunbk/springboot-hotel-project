@@ -1,10 +1,13 @@
-package com.ptbh.kyungsunghotel.member;
+package com.ptbh.kyungsunghotel.web.member;
 
-import com.ptbh.kyungsunghotel.board.Board;
-import com.ptbh.kyungsunghotel.reserve.Reserve;
-import com.ptbh.kyungsunghotel.reserve.ReserveForm;
-import com.ptbh.kyungsunghotel.reserve.ReserveRepository;
-import com.ptbh.kyungsunghotel.reserve.ReserveService;
+import com.ptbh.kyungsunghotel.domain.board.Board;
+import com.ptbh.kyungsunghotel.domain.member.Member;
+import com.ptbh.kyungsunghotel.domain.member.MemberRepository;
+import com.ptbh.kyungsunghotel.domain.reserve.Reserve;
+import com.ptbh.kyungsunghotel.web.reserve.ReserveForm;
+import com.ptbh.kyungsunghotel.domain.reserve.ReserveRepository;
+import com.ptbh.kyungsunghotel.domain.reserve.ReserveService;
+import com.ptbh.kyungsunghotel.web.SessionConstants;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;

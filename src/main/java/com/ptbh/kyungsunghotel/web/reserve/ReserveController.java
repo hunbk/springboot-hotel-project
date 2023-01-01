@@ -1,9 +1,11 @@
-package com.ptbh.kyungsunghotel.reserve;
+package com.ptbh.kyungsunghotel.web.reserve;
 
-import com.ptbh.kyungsunghotel.member.Member;
-import com.ptbh.kyungsunghotel.member.SessionConstants;
-import com.ptbh.kyungsunghotel.room.Room;
-import com.ptbh.kyungsunghotel.room.RoomRepository;
+import com.ptbh.kyungsunghotel.domain.member.Member;
+import com.ptbh.kyungsunghotel.domain.reserve.Reserve;
+import com.ptbh.kyungsunghotel.domain.reserve.ReserveRepository;
+import com.ptbh.kyungsunghotel.web.SessionConstants;
+import com.ptbh.kyungsunghotel.domain.room.Room;
+import com.ptbh.kyungsunghotel.domain.room.RoomRepository;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;

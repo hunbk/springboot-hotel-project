@@ -1,13 +1,13 @@
 package com.ptbh.kyungsunghotel;
 
-import com.ptbh.kyungsunghotel.board.Board;
-import com.ptbh.kyungsunghotel.board.BoardRepository;
-import com.ptbh.kyungsunghotel.member.Member;
-import com.ptbh.kyungsunghotel.member.MemberRepository;
-import com.ptbh.kyungsunghotel.reserve.Reserve;
-import com.ptbh.kyungsunghotel.reserve.ReserveRepository;
-import com.ptbh.kyungsunghotel.room.Room;
-import com.ptbh.kyungsunghotel.room.RoomRepository;
+import com.ptbh.kyungsunghotel.domain.board.Board;
+import com.ptbh.kyungsunghotel.domain.board.BoardRepository;
+import com.ptbh.kyungsunghotel.domain.member.Member;
+import com.ptbh.kyungsunghotel.domain.member.MemberRepository;
+import com.ptbh.kyungsunghotel.domain.reserve.Reserve;
+import com.ptbh.kyungsunghotel.domain.reserve.ReserveRepository;
+import com.ptbh.kyungsunghotel.domain.room.Room;
+import com.ptbh.kyungsunghotel.domain.room.RoomRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

@@ -1,4 +1,4 @@
-package com.ptbh.kyungsunghotel.reserve;
+package com.ptbh.kyungsunghotel.web.reserve;
 
 import lombok.Data;
 

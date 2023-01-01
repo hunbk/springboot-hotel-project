@@ -1,4 +1,4 @@
-package com.ptbh.kyungsunghotel.board;
+package com.ptbh.kyungsunghotel.web.board;
 
 import lombok.Data;
 

@@ -1,7 +1,9 @@
-package com.ptbh.kyungsunghotel.board;
+package com.ptbh.kyungsunghotel.web.board;
 
-import com.ptbh.kyungsunghotel.member.Member;
-import com.ptbh.kyungsunghotel.member.SessionConstants;
+import com.ptbh.kyungsunghotel.domain.board.Board;
+import com.ptbh.kyungsunghotel.domain.board.BoardRepository;
+import com.ptbh.kyungsunghotel.domain.member.Member;
+import com.ptbh.kyungsunghotel.web.SessionConstants;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
