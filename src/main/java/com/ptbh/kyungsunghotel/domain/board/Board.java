@@ -40,6 +40,12 @@ public class Board {
     @JoinColumn(name = "member_id", foreignKey = @ForeignKey(name = "fk_board_member"), nullable = false)
     private Member member;
 
+    public Board(String title, String content, Member member) {
+        this.title = title;
+        this.content = content;
+        this.member = member;
+    }
+
     @Builder
     //현재 TestDataInit 에서만 사용중
     public Board(Long id, String title, String content, LocalDateTime createdDate, LocalDateTime modifiedDate, Member member) {
