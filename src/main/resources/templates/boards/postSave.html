@@ -1,32 +1,31 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head th:replace="fragments/header :: header">
-    <title>postUpdate</title>
+    <title>post</title>
 </head>
 <body class="d-flex flex-column min-vh-100">
 <nav th:replace="fragments/navbar :: navbar"></nav>
 
     <div style="padding: 10px; text-align: center;">
-        <h3><a style="text-decoration: none;">게시글 수정</a></h3>
+        <h3><a style="text-decoration: none;">게시글 작성</a></h3>
     </div>
-
     <div class="container-sm" style="width: 900px;">
-        <form th:action th:object="${form}" th:method="put">
+        <form th:action th:object="${form}" method="post">
             <div th:if="${#fields.hasErrors('*')}" class="alert alert-danger pb-0">
                 <p>입력하신 내용을 다시 한번 확인해주세요.</p>
             </div>
             <div class="mb-3">
                 <label for="title" class="form-label">제목</label>
                 <input type="text" class="form-control" th:errorclass="is-invalid" th:field="*{title}" id="title"
-                       placeholder="제목을 입력해주세요.">
+                       placeholder="제목을 입력해주세요">
                 <div th:errorclass="invalid-feedback" th:errors="*{title}">
                     제목 오류
                 </div>
             </div>
             <div class="mb-3">
                 <label for="content" class="form-label">내용</label>
-                    <textarea class="form-control" th:errorclass="is-invalid" style="white-space: pre-line;" th:field="*{content}" id="content" rows="10"
-                              placeholder="내용을 입력해주세요."></textarea>
+                <textarea class="form-control" th:errorclass="is-invalid" style="white-space: pre-line;" th:field="*{content}"
+                          id="content" rows="10" placeholder="내용을 입력해주세요"></textarea>
                 <div th:errorclass="invalid-feedback" th:errors="*{content}">
                     내용 오류
                 </div>
@@ -34,7 +33,7 @@
 
             <div style="text-align: right;">
                 <input type="button" class="btn btn-outline-secondary" th:value="목록" th:onclick="|location.href='/boards'|" >
-                <input type="submit" class="btn btn-dark" th:value="수정">
+                <input type="submit" class="btn btn-dark" th:value="작성">
             </div>
         </form>
     </div>
