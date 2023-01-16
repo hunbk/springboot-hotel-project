@@ -1,0 +1,36 @@
+server:
+  servlet:
+    session:
+      tracking-modes: cookie # URL에 JSESSIONID가 붙어서 나가는 설정을 해제
+
+spring:
+  mvc:
+    hiddenmethod:
+      filter:
+        enabled: true
+
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+
+  datasource:
+    url: jdbc:h2:mem:test
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    properties:
+      hibernate:
+#        show_sql: true # sql을 로깅
+        format_sql: true # sql을 보기 좋게 정렬
+        highlight_sql: true # sql에 색깔을 추가
+
+logging:
+  level:
+    org.hibernate:
+      sql: debug # 이 옵션을 사용하면 System.out 방식이 아니라 Logger를 사용하여 로깅
+#      type.descriptor.sql: trace # sql에 ?로 표시되는 내용 출력
