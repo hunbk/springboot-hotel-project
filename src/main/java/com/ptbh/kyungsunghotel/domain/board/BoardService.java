@@ -2,6 +2,7 @@ package com.ptbh.kyungsunghotel.domain.board;
 
 import com.ptbh.kyungsunghotel.domain.member.Member;
 import com.ptbh.kyungsunghotel.domain.member.MemberRepository;
+import com.ptbh.kyungsunghotel.exception.board.NoSuchBoardException;
 import com.ptbh.kyungsunghotel.web.board.PageRequestDto;
 import com.ptbh.kyungsunghotel.web.board.PostSaveForm;
 import com.ptbh.kyungsunghotel.web.board.PostUpdateForm;
@@ -23,13 +24,14 @@ public class BoardService {
     private final MemberRepository memberRepository;
 
     /**
-     * boardId로 검색한 Board를 BoardDto에 담아서 리턴
+     * boardId로 검색한 Board 엔티티를 BoardDto에 담아서 리턴
      *
-     * @param boardId
-     * @return BoardDto
+     * @param boardId Board 엔티티의 id 필드
+     * @return Board 엔티티를 매핑한 BoardDto
      */
     public BoardDto findByBoardId(Long boardId) {
-        Board foundBoard = boardRepository.findById(boardId).get();
+        Board foundBoard = boardRepository.findById(boardId)
+                .orElseThrow(NoSuchBoardException::new);
         return BoardDto.from(foundBoard);
     }
 
@@ -52,9 +54,9 @@ public class BoardService {
     /**
      * searchType 과 query 조건으로 검색한 Board 엔티티를 Page 타입으로 리턴
      *
-     * @param searchType
-     * @param query
-     * @param pageable
+     * @param searchType 검색 조건
+     * @param query 검색어
+     * @param pageable 페이징
      * @return Page of Board Entity
      */
     private Page<Board> findBoardByQuery(SearchType searchType, String query, Pageable pageable) {
@@ -78,7 +80,8 @@ public class BoardService {
 
     @Transactional
     public Long saveBoard(Long memberId, PostSaveForm form) {
-        Member member = memberRepository.findById(memberId).get();
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(NoSuchBoardException::new);
         Board board = Board.builder()
                 .member(member)
                 .title(form.getTitle())
@@ -93,13 +96,15 @@ public class BoardService {
 
     @Transactional
     public void updateBoard(Long boardId, PostUpdateForm form) {
-        Board foundBoard = boardRepository.findById(boardId).get();
+        Board foundBoard = boardRepository.findById(boardId)
+                .orElseThrow(NoSuchBoardException::new);
         foundBoard.update(form.getTitle(), form.getContent());
     }
 
     @Transactional
     public void deleteBoard(Long boardId) {
-        Board foundBoard = boardRepository.findById(boardId).get();
+        Board foundBoard = boardRepository.findById(boardId)
+                .orElseThrow(NoSuchBoardException::new);
         boardRepository.delete(foundBoard);
     }
 }
