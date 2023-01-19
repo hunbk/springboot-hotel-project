@@ -16,6 +16,7 @@ import java.time.LocalDateTime;
 @EntityListeners(AuditingEntityListener.class)
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Builder
 public class Board {
 
     @Id
@@ -46,8 +47,6 @@ public class Board {
         this.member = member;
     }
 
-    @Builder
-    //현재 TestDataInit 에서만 사용중
     public Board(Long id, String title, String content, LocalDateTime createdDate, LocalDateTime modifiedDate, Member member) {
         this.id = id;
         this.title = title;

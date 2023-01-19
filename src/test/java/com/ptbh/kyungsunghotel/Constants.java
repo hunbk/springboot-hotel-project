@@ -7,6 +7,6 @@ public abstract class Constants {
     public static final String NAME = "test12!";
     public static final String NICKNAME = "test12!";
     public static final String EMAIL = "test12@email.com";
-    public static final String PHONE_NUMBER = "01012345678";
+    public static final String CELLPHONE = "01012345678";
 
 }

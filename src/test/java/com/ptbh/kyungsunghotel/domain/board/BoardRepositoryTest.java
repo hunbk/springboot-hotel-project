@@ -2,18 +2,21 @@ package com.ptbh.kyungsunghotel.domain.board;
 
 import com.ptbh.kyungsunghotel.domain.member.Member;
 import com.ptbh.kyungsunghotel.domain.member.MemberRepository;
+import com.ptbh.kyungsunghotel.exception.board.NoSuchBoardException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.NoSuchElementException;
+import java.util.List;
 
 import static com.ptbh.kyungsunghotel.Constants.*;
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.*;
 
 @DataJpaTest
+@Transactional
 class BoardRepositoryTest {
 
     @Autowired
@@ -25,8 +28,8 @@ class BoardRepositoryTest {
     private Member member;
 
     @BeforeEach
-    void init() {
-        member = new Member(LOGIN_ID, PASSWORD, NAME, NICKNAME, EMAIL, PHONE_NUMBER);
+    void setup() {
+        member = new Member(LOGIN_ID, PASSWORD, NAME, NICKNAME, EMAIL, CELLPHONE);
         memberRepository.save(member);
     }
 
@@ -41,8 +44,9 @@ class BoardRepositoryTest {
 
         //then
         assertThat(savedBoard.getId()).isNotNull();
-        assertThat(board).isEqualTo(savedBoard);
-        System.out.println("savedBoard.getCreatedDate() = " + savedBoard.getCreatedDate());
+        assertThat(savedBoard.getTitle()).isEqualTo("제목 1");
+        assertThat(savedBoard.getContent()).isEqualTo("내용 1");
+        assertThat(savedBoard.getCreatedDate()).isNotNull();
     }
 
     @Test
@@ -52,28 +56,29 @@ class BoardRepositoryTest {
         Board board = new Board("제목 1", "내용 1", member);
 
         //when
-        Board savedBoard = boardRepository.save(board);
-        Board foundBoard = boardRepository.findById(savedBoard.getId())
-                .orElseThrow(() -> new NoSuchElementException("존재하지 않는 회원입니다."));
+        boardRepository.save(board);
+        Board foundBoard = boardRepository.findById(board.getId())
+                .orElseThrow(NoSuchBoardException::new);
 
         //then
-        assertThat(foundBoard.getId()).isEqualTo(savedBoard.getId());
-        assertThat(foundBoard).isEqualTo(savedBoard);
+        assertThat(foundBoard.getId()).isEqualTo(board.getId());
+        assertThat(foundBoard).isEqualTo(board);
     }
 
     @Test
-    @DisplayName("게시글을 수정할 수 있다.")
-    void updateBoard() {
+    @DisplayName("전체 게시글을 조회할 수 있다.")
+    void findAll() {
         //given
-        Board board = new Board("제목 1", "내용 1", member);
+        Board board1 = new Board("제목 1", "내용 1", member);
+        Board board2 = new Board("제목 2", "내용 2", member);
+        boardRepository.save(board1);
+        boardRepository.save(board2);
 
         //when
-        Board savedBoard = boardRepository.save(board);
-        savedBoard.update("수정된 제목", "수정된 내용");
+        List<Board> result = boardRepository.findAll();
 
         //then
-        assertThat(savedBoard.getTitle()).isEqualTo("수정된 제목");
-        assertThat(savedBoard.getContent()).isEqualTo("수정된 내용");
+        assertThat(result.size()).isEqualTo(2);
     }
 
 }
