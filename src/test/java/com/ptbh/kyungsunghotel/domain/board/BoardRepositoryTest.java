@@ -3,12 +3,13 @@ package com.ptbh.kyungsunghotel.domain.board;
 import com.ptbh.kyungsunghotel.domain.member.Member;
 import com.ptbh.kyungsunghotel.domain.member.MemberRepository;
 import com.ptbh.kyungsunghotel.exception.board.NoSuchBoardException;
+import com.ptbh.kyungsunghotel.config.JpaAuditingConfig;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.context.annotation.Import;
 
 import java.util.List;
 
@@ -16,7 +17,7 @@ import static com.ptbh.kyungsunghotel.Constants.*;
 import static org.assertj.core.api.Assertions.*;
 
 @DataJpaTest
-@Transactional
+@Import(JpaAuditingConfig.class)
 class BoardRepositoryTest {
 
     @Autowired
