@@ -8,10 +8,10 @@ import com.ptbh.kyungsunghotel.web.board.PostUpdateForm;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.transaction.annotation.Transactional;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -20,17 +20,16 @@ import static com.ptbh.kyungsunghotel.Constants.*;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.BDDMockito.*;
 
-@SpringBootTest
-@Transactional
-class BoardServiceTest {
+@ExtendWith(SpringExtension.class)
+class BoardServiceUnitTest {
 
-    @MockBean
+    @Mock
     private MemberRepository memberRepository;
 
-    @MockBean
+    @Mock
     private BoardRepository boardRepository;
 
-    @Autowired
+    @InjectMocks
     private BoardService boardService;
 
     private Member member;
