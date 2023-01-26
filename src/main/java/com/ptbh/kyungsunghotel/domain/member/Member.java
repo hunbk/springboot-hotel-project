@@ -15,7 +15,10 @@ import java.util.List;
 @Entity
 public class Member {
     @Id
-    @Column(name = "loginId")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "member_id")
+    private Long id;
+
     @NotBlank(message = "아이디는 필수입니다")
     private String loginId;
 
@@ -24,6 +27,9 @@ public class Member {
 
     @NotBlank(message = "이름은 필수입니다")
     private String name;
+
+    @NotBlank(message = "이름은 필수입니다")
+    private String nickname;
 
     @NotBlank(message = "이메일은 필수입니다")
     private String email;

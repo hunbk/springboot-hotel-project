@@ -3,6 +3,7 @@ package com.ptbh.kyungsunghotel.domain.board;
 import com.ptbh.kyungsunghotel.domain.member.Member;
 import com.ptbh.kyungsunghotel.domain.member.MemberRepository;
 import com.ptbh.kyungsunghotel.exception.board.NoSuchBoardException;
+import com.ptbh.kyungsunghotel.exception.member.NoSuchMemberException;
 import com.ptbh.kyungsunghotel.web.board.PageRequestDto;
 import com.ptbh.kyungsunghotel.web.board.PostSaveForm;
 import com.ptbh.kyungsunghotel.web.board.PostUpdateForm;
@@ -81,7 +82,7 @@ public class BoardService {
     @Transactional
     public Long saveBoard(Long memberId, PostSaveForm form) {
         Member member = memberRepository.findById(memberId)
-                .orElseThrow(NoSuchBoardException::new);
+                .orElseThrow(NoSuchMemberException::new);
         Board board = Board.builder()
                 .member(member)
                 .title(form.getTitle())
