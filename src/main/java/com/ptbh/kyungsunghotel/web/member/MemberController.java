@@ -4,10 +4,10 @@ import com.ptbh.kyungsunghotel.domain.board.Board;
 import com.ptbh.kyungsunghotel.domain.member.Member;
 import com.ptbh.kyungsunghotel.domain.member.MemberRepository;
 import com.ptbh.kyungsunghotel.domain.reserve.Reserve;
-import com.ptbh.kyungsunghotel.web.reserve.ReserveForm;
 import com.ptbh.kyungsunghotel.domain.reserve.ReserveRepository;
 import com.ptbh.kyungsunghotel.domain.reserve.ReserveService;
 import com.ptbh.kyungsunghotel.web.SessionConstants;
+import com.ptbh.kyungsunghotel.web.reserve.ReserveForm;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -84,12 +84,13 @@ public class MemberController {
             return "members/join";
         }
 
-        Member member = new Member();
-        member.setLoginId(joinForm.getLoginId());
-        member.setPassword(joinForm.getPassword());
-        member.setName(joinForm.getName());
-        member.setEmail(joinForm.getEmail());
-        member.setTelephone(joinForm.getTelephone());
+        Member member = new Member(
+                joinForm.getLoginId(),
+                joinForm.getPassword(),
+                joinForm.getName(),
+                joinForm.getNickname(),
+                joinForm.getEmail(),
+                joinForm.getCellPhone());
         memberRepository.save(member);
         return "redirect:/member/login";
     }
@@ -111,7 +112,7 @@ public class MemberController {
     @GetMapping("/member/info")
     public String showMemberInfo(@SessionAttribute(value = SessionConstants.LOGIN_MEMBER, required = false) Member member, Model model) {
         List<Board> boards = memberRepository.findByLoginId(member.getLoginId()).orElse(null).getBoards();
-        boards.sort((o1, o2) -> o2.getBoardNo() - o1.getBoardNo());
+        boards.sort((o1, o2) -> (int) (o2.getId() - o1.getId()));
 
         List<Reserve> reserves = memberRepository.findByLoginId(member.getLoginId()).orElse(null).getReserves();
         List<ReserveForm> list = new ArrayList<>();
@@ -141,8 +142,9 @@ public class MemberController {
     public String showMemberUpdateForm(@SessionAttribute(value = SessionConstants.LOGIN_MEMBER, required = false) Member member, Model model) {
         UpdateForm updateForm = new UpdateForm();
         updateForm.setName(member.getName());
+        updateForm.setNickname(member.getNickname());
         updateForm.setEmail(member.getEmail());
-        updateForm.setTelephone(member.getTelephone());
+        updateForm.setCellPhone(member.getCellPhone());
         model.addAttribute("updateForm", updateForm);
         return "members/memberUpdateForm";
     }
@@ -157,9 +159,8 @@ public class MemberController {
             return "members/memberUpdateForm";
         }
 
-        member.setName(updateForm.getName());
-        member.setEmail(updateForm.getEmail());
-        member.setTelephone(updateForm.getTelephone());
+        member.update(updateForm.getName(), updateForm.getNickname(), updateForm.getEmail(), updateForm.getCellPhone());
+
         memberRepository.save(member);
         return "redirect:/member/info";
     }
@@ -191,7 +192,7 @@ public class MemberController {
             return "members/changePasswordForm";
         }
 
-        member.setPassword(passwordForm.getNewPassword());
+        member.changePassword(passwordForm.getNewPassword());
         memberRepository.save(member);
         return "redirect:/";
     }

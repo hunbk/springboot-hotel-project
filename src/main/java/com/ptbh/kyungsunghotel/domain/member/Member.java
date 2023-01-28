@@ -3,55 +3,70 @@ package com.ptbh.kyungsunghotel.domain.member;
 
 import com.ptbh.kyungsunghotel.domain.board.Board;
 import com.ptbh.kyungsunghotel.domain.reserve.Reserve;
-import lombok.Builder;
-import lombok.Data;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotBlank;
 import java.util.ArrayList;
 import java.util.List;
 
-@Data
 @Entity
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Member {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "member_id")
     private Long id;
 
-    @NotBlank(message = "아이디는 필수입니다")
+    @Column(nullable = false, length = 20, unique = true)
     private String loginId;
 
-    @NotBlank(message = "비밀번호는 필수입니다")
+    @Column(nullable = false, length = 30, unique = true)
     private String password;
 
-    @NotBlank(message = "이름은 필수입니다")
+    @Column(nullable = false, length = 10)
     private String name;
 
-    @NotBlank(message = "이름은 필수입니다")
+    @Column(nullable = false, length = 12, unique = true)
     private String nickname;
 
-    @NotBlank(message = "이메일은 필수입니다")
+    @Column(nullable = false, length = 50, unique = true)
     private String email;
 
-    @NotBlank(message = "전화번호는 필수입니다")
-    private String telephone;
+    @Column(nullable = false, length = 11)
+    private String cellPhone;
 
-    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE)
     private List<Board> boards = new ArrayList<>();
 
-    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE)
     private List<Reserve> reserves = new ArrayList<>();
 
-    public Member() {
-    }
-
-    @Builder
-    public Member(String loginId, String password, String name, String email, String telephone) {
+    public Member(String loginId, String password, String name, String nickname, String email, String cellPhone) {
         this.loginId = loginId;
         this.password = password;
         this.name = name;
+        this.nickname = nickname;
         this.email = email;
-        this.telephone = telephone;
+        this.cellPhone = cellPhone;
+    }
+
+    public Member(Long id, String loginId, String password, String name, String nickname, String email, String cellPhone) {
+        this(loginId, password, name, nickname, email, cellPhone);
+        this.id = id;
+    }
+
+    public void update(String name, String nickname, String email, String cellPhone) {
+        this.name = name;
+        this.nickname = nickname;
+        this.email = email;
+        this.cellPhone = cellPhone;
+    }
+
+    public void changePassword(String newPassword) {
+        this.password = newPassword;
     }
 }

@@ -13,7 +13,7 @@
         <div class="card-body">
             <p>이름: <span th:text="${member.name}"></span></p>
             <p>이메일: <span th:text="${member.email}"></span></p>
-            <p>전화번호: <span th:text="${member.telephone}"></span></p>
+            <p>전화번호: <span th:text="${member.getCellPhone}"></span></p>
             <div style="text-align: end;">
                 <button type="button" class="btn btn-dark" th:onclick="|location.href='@{/member/update}'|">정보 수정</button>
                 <button type="button" class="btn btn-dark" th:onclick="|location.href='@{/member/changePassword}'|">비밀번호 변경</button>
@@ -60,8 +60,8 @@
                 </tr>
                 </thead>
                 <tr scope="row" th:each="board : ${boards}">
-                    <td><a th:href="@{/board/{boardNo}(boardNo=${board.boardNo})}" th:text="${board.title}"></a></td>
-                    <td th:text="${#temporals.format(board.createTime, 'yyyy-MM-dd HH:mm:ss')}"></td>
+                    <td><a th:href="@{/boards/{id}(id=${board.id})}" th:text="${board.title}"></a></td>
+                    <td th:text="${#temporals.format(board.createdDate, 'yyyy-MM-dd HH:mm:ss')}"></td>
                 </tr>
             </table>
         </div>
