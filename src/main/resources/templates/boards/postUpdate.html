@@ -11,7 +11,7 @@
     </div>
 
     <div class="container-sm" style="width: 900px;">
-        <form th:action th:object="${form}" th:method="put">
+        <form th:action th:object="${postUpdateForm}" th:method="put">
             <div th:if="${#fields.hasErrors('*')}" class="alert alert-danger pb-0">
                 <p>입력하신 내용을 다시 한번 확인해주세요.</p>
             </div>

@@ -10,7 +10,7 @@
         <h3><a style="text-decoration: none;">게시글 작성</a></h3>
     </div>
     <div class="container-sm" style="width: 900px;">
-        <form th:action th:object="${form}" method="post">
+        <form th:action th:object="${postSaveForm}" method="post">
             <div th:if="${#fields.hasErrors('*')}" class="alert alert-danger pb-0">
                 <p>입력하신 내용을 다시 한번 확인해주세요.</p>
             </div>

@@ -41,12 +41,12 @@ public class BoardController {
 
     @GetMapping("/save")
     public String postSaveForm(Model model) {
-        model.addAttribute("form", new PostSaveForm());
+        model.addAttribute("postSaveForm", new PostSaveForm());
         return "boards/postSave";
     }
 
     @PostMapping("/save")
-    public String savePost(@Validated @ModelAttribute("form") PostSaveForm postSaveForm,
+    public String savePost(@Validated @ModelAttribute PostSaveForm postSaveForm,
                            BindingResult bindingResult,
                            //TODO @LoginMember 어노테이션으로 개선
                            @SessionAttribute(value = SessionConstants.LOGIN_MEMBER, required = false) Member member) {
@@ -65,14 +65,14 @@ public class BoardController {
         BoardDto boardDto = boardService.findByBoardId(boardId);
         PostUpdateForm postUpdateForm = PostUpdateForm.from(boardDto);
 
-        model.addAttribute("form", postUpdateForm);
+        model.addAttribute("postUpdateForm", postUpdateForm);
 
         return "boards/postUpdate";
     }
 
     @PutMapping("/{boardId}/update")
     public String updatePost(@PathVariable Long boardId,
-                             @Validated @ModelAttribute("form") PostUpdateForm postUpdateForm,
+                             @Validated @ModelAttribute PostUpdateForm postUpdateForm,
                              BindingResult bindingResult,
                              RedirectAttributes redirectAttributes) {
 
