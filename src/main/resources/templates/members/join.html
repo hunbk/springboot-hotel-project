@@ -13,7 +13,7 @@
                     <h4>회원가입</h4>
                 </div>
                 <div class="card-body">
-                    <form id="joinForm" th:action="@{/member/join}" th:object="${joinForm}" method="post">
+                    <form id="joinForm" th:action="@{/join}" th:object="${joinForm}" method="post">
                         <div class="mb-3" th:if="${#fields.hasGlobalErrors()}">
                             <p th:each="err : ${#fields.globalErrors()}" th:text="${err}">전체 오류 메시지</p>
                         </div>
@@ -62,7 +62,7 @@
     function checkId(){
         var id = $('#id').val();
     $.ajax({
-        url:'/member/join/checkId',
+        url:'/join/checkId',
         type:'post',
         data:{id:id},
         success:function(isDuplicate){

@@ -13,7 +13,7 @@
                     <a class="nav-link" href="/">KYUNG SUNG</a>
                 </li>
                 <li class="nav-item" th:if="${session.loginMember == null}">
-                    <a class="nav-link" href="/member/login">예약</a>
+                    <a class="nav-link" href="/login">예약</a>
                 </li>
                 <li class="nav-item" th:if="${session.loginMember != null}">
                 <a class="nav-link" href="/reserve">예약</a>
@@ -22,13 +22,15 @@
                     <a class="nav-link" href="/boards">고객센터</a>
                 </li>
                 <li class="nav-item" th:if="${session.loginMember == null}">
-                    <a class="nav-link" href="/member/login">로그인</a>
+                    <a class="nav-link" href="/login">로그인</a>
                 </li>
                 <li class="nav-item" th:if="${session.loginMember != null}">
                     <a class="nav-link" th:text="${session.loginMember.name}" th:href="@{/member/info}">memberName</a>
                 </li>
                 <li class="nav-item" th:if="${session.loginMember != null}">
-                    <a class="nav-link" href="/member/logout">로그아웃</a>
+                    <form id="logout-form" action="/logout" method="post">
+                        <a class="nav-link" onclick="document.getElementById('logout-form').submit();" href="#">로그아웃</a>
+                    </form>
                 </li>
             </ul>
             <hr>

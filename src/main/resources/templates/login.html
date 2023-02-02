@@ -13,21 +13,19 @@
                     <div style="margin-bottom: 20px;">
                         <h4 class="text-center">로그인</h4>
                     </div>
-                    <form th:action="@{/member/login}" th:object="${loginForm}" method="post">
-                        <div th:if="${#fields.hasGlobalErrors()}">
-                            <p th:each="err : ${#fields.globalErrors()}" th:text="${err}">전체 오류 메시지</p>
+                    <form th:action="@{/login}" th:object="${loginForm}" method="post">
+                        <div class="form-outline mb-4">
+                            <input type="text" name="loginId" class="form-control" th:field="*{loginId}" placeholder="아이디 입력">
                         </div>
                         <div class="form-outline mb-4">
-                            <input type="text" name="loginId" class="form-control" th:field="*{loginId}" placeholder="아이디 입력" required>
-                            <p th:if="${#fields.hasErrors('loginId')}" th:errors="*{loginId}">Incorrect date</p>
+                            <input type="password" name="password" class="form-control" th:field="*{password}" placeholder="비밀번호 입력">
                         </div>
-                        <div class="form-outline mb-4">
-                            <input type="password" name="password" class="form-control" th:field="*{password}" placeholder="비밀번호 입력" required>
-                            <p th:if="${#fields.hasErrors('password')}" th:errors="*{password}">Incorrect date</p>
+                        <div th:if="${#fields.hasErrors()}">
+                            <p th:text="${#fields.errors().get(0)}"></p>
                         </div>
                         <div class="d-grid">
                             <button type="submit" class="btn btn-dark mb-2">로그인</button>
-                            <button type="button" class="btn btn-outline-secondary mb-2" onclick="location.href='/member/join';">회원가입</button>
+                            <button type="button" class="btn btn-outline-secondary mb-2" onclick="location.href='/join';">회원가입</button>
                         </div>
                     </form>
                 </div>

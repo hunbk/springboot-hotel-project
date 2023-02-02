@@ -7,6 +7,7 @@ import com.ptbh.kyungsunghotel.domain.reserve.Reserve;
 import com.ptbh.kyungsunghotel.domain.reserve.ReserveRepository;
 import com.ptbh.kyungsunghotel.domain.reserve.ReserveService;
 import com.ptbh.kyungsunghotel.web.SessionConstants;
+import com.ptbh.kyungsunghotel.web.auth.LoginForm;
 import com.ptbh.kyungsunghotel.web.reserve.ReserveForm;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -14,8 +15,6 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -30,49 +29,15 @@ public class MemberController {
         this.reserveRepository = reserveRepository;
     }
 
-    @GetMapping("/member/login")
-    public String showLogin(Model model) {
-        model.addAttribute("loginForm", new LoginForm());
-        return "members/login";
-    }
-
-    @PostMapping("/member/login")
-    public String login(@Validated LoginForm loginForm, BindingResult bindingResult,
-                        HttpServletRequest request) {
-        if (bindingResult.hasErrors()) {
-            return "members/login";
-        }
-
-        Member member = memberRepository.findByLoginId(loginForm.getLoginId())
-                .filter(m -> m.getPassword().equals(loginForm.getPassword()))
-                .orElse(null);
-
-        if (member == null) {
-            bindingResult.reject("loginFail", "로그인 정보가 올바르지 않습니다.");
-            return "members/login";
-        }
-
-        HttpSession session = request.getSession();
-        session.setAttribute(SessionConstants.LOGIN_MEMBER, member);
-
-        return "redirect:/";
-    }
-
-    @GetMapping("/member/logout")
-    public String logout(HttpServletRequest request) {
-        request.getSession().invalidate();
-        request.getSession(true);
-        return "redirect:/";
-    }
-
-    @GetMapping("/member/join")
-    public String showJoin(Model model) {
+    @GetMapping("/join")
+    public String joinForm(Model model) {
         model.addAttribute("joinForm", new JoinForm());
         return "members/join";
     }
 
-    @PostMapping("/member/join")
-    public String join(@Validated JoinForm joinForm, BindingResult bindingResult) {
+    @PostMapping("/join")
+    public String join(@Validated @ModelAttribute JoinForm joinForm, BindingResult bindingResult) {
+
         if (bindingResult.hasErrors()) {
             return "members/join";
         }
@@ -92,10 +57,10 @@ public class MemberController {
                 joinForm.getEmail(),
                 joinForm.getCellPhone());
         memberRepository.save(member);
-        return "redirect:/member/login";
+        return "redirect:/login";
     }
 
-    @PostMapping("/member/join/checkId")
+    @PostMapping("/join/checkId")
     @ResponseBody
     public boolean checkId(@RequestParam("id") String id) {
         boolean isDuplicate;
