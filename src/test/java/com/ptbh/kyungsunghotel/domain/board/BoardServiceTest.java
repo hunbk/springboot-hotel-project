@@ -13,7 +13,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.Optional;
 
 import static com.ptbh.kyungsunghotel.Constants.*;
@@ -128,8 +127,6 @@ class BoardServiceTest {
                 .id(1L)
                 .title("제목 1")
                 .content("내용 1")
-                .createdDate(LocalDateTime.now())
-                .modifiedDate(LocalDateTime.now())
                 .member(member)
                 .build();
     }

@@ -1,23 +1,19 @@
 package com.ptbh.kyungsunghotel.domain.board;
 
+import com.ptbh.kyungsunghotel.domain.BaseTimeEntity;
 import com.ptbh.kyungsunghotel.domain.member.Member;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
 
 @Entity
-@EntityListeners(AuditingEntityListener.class)
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Builder
-public class Board {
+public class Board extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -30,13 +26,6 @@ public class Board {
     @Column(nullable = false, columnDefinition = "TEXT")
     private String content;
 
-    @CreatedDate
-    @Column(updatable = false)
-    private LocalDateTime createdDate;
-
-    @LastModifiedDate
-    private LocalDateTime modifiedDate;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id", foreignKey = @ForeignKey(name = "fk_board_member"), nullable = false)
     private Member member;
@@ -47,12 +36,10 @@ public class Board {
         this.member = member;
     }
 
-    public Board(Long id, String title, String content, LocalDateTime createdDate, LocalDateTime modifiedDate, Member member) {
+    public Board(Long id, String title, String content, Member member) {
         this.id = id;
         this.title = title;
         this.content = content;
-        this.createdDate = createdDate;
-        this.modifiedDate = modifiedDate;
         this.member = member;
     }
 

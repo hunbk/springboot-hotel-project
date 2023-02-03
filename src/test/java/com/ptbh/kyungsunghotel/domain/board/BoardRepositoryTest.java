@@ -1,9 +1,9 @@
 package com.ptbh.kyungsunghotel.domain.board;
 
+import com.ptbh.kyungsunghotel.config.JpaAuditingConfig;
 import com.ptbh.kyungsunghotel.domain.member.Member;
 import com.ptbh.kyungsunghotel.domain.member.MemberRepository;
 import com.ptbh.kyungsunghotel.exception.board.NoSuchBoardException;
-import com.ptbh.kyungsunghotel.config.JpaAuditingConfig;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -14,7 +14,7 @@ import org.springframework.context.annotation.Import;
 import java.util.List;
 
 import static com.ptbh.kyungsunghotel.Constants.*;
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @DataJpaTest
 @Import(JpaAuditingConfig.class)
@@ -48,6 +48,24 @@ class BoardRepositoryTest {
         assertThat(savedBoard.getTitle()).isEqualTo("제목 1");
         assertThat(savedBoard.getContent()).isEqualTo("내용 1");
         assertThat(savedBoard.getCreatedDate()).isNotNull();
+    }
+
+    @Test
+    @DisplayName("게시글을 수정할 수 있다.")
+    void updateBoard() {
+        //given
+        Board board = new Board("제목 1", "내용 1", member);
+        boardRepository.save(board);
+
+        //when
+        board.update("수정된 제목", "수정된 내용");
+        boardRepository.flush();
+
+        //then
+        assertThat(board.getTitle()).isEqualTo("수정된 제목");
+        assertThat(board.getContent()).isEqualTo("수정된 내용");
+        assertThat(board.getModifiedDate()).isNotEqualTo(board.getCreatedDate());
+        assertThat(board.getModifiedDate()).isAfter(board.getCreatedDate());
     }
 
     @Test

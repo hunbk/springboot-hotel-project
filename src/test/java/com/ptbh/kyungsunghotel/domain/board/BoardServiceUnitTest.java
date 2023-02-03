@@ -13,7 +13,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.time.LocalDateTime;
 import java.util.Optional;
 
 import static com.ptbh.kyungsunghotel.Constants.*;
@@ -127,8 +126,6 @@ class BoardServiceUnitTest {
                 .id(1L)
                 .title("제목 1")
                 .content("내용 1")
-                .createdDate(LocalDateTime.now())
-                .modifiedDate(LocalDateTime.now())
                 .member(member)
                 .build();
     }
