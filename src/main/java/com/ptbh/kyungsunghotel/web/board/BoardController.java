@@ -13,7 +13,6 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 
 @Controller
@@ -73,8 +72,7 @@ public class BoardController {
     @PutMapping("/{boardId}/update")
     public String updatePost(@PathVariable Long boardId,
                              @Validated @ModelAttribute PostUpdateForm postUpdateForm,
-                             BindingResult bindingResult,
-                             RedirectAttributes redirectAttributes) {
+                             BindingResult bindingResult) {
 
         if (bindingResult.hasErrors()) {
             return "boards/postUpdate";
@@ -82,7 +80,6 @@ public class BoardController {
 
         boardService.updateBoard(boardId, postUpdateForm);
 
-        redirectAttributes.addAttribute("boardId", boardId);
         return "redirect:/boards/{boardId}";
     }
 
