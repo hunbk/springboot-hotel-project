@@ -3,31 +3,34 @@ package com.ptbh.kyungsunghotel.web.member;
 import com.ptbh.kyungsunghotel.domain.board.Board;
 import com.ptbh.kyungsunghotel.domain.member.Member;
 import com.ptbh.kyungsunghotel.domain.member.MemberRepository;
+import com.ptbh.kyungsunghotel.domain.member.MemberService;
 import com.ptbh.kyungsunghotel.domain.reserve.Reserve;
 import com.ptbh.kyungsunghotel.domain.reserve.ReserveRepository;
 import com.ptbh.kyungsunghotel.domain.reserve.ReserveService;
 import com.ptbh.kyungsunghotel.web.SessionConstants;
 import com.ptbh.kyungsunghotel.web.auth.LoginForm;
 import com.ptbh.kyungsunghotel.web.reserve.ReserveForm;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.SessionAttribute;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Controller
+@RequiredArgsConstructor
 public class MemberController {
     private final MemberRepository memberRepository;
     private final ReserveRepository reserveRepository;
-
-    public MemberController(MemberRepository memberRepository, ReserveRepository reserveRepository) {
-        this.memberRepository = memberRepository;
-        this.reserveRepository = reserveRepository;
-    }
+    private final MemberService memberService;
 
     @GetMapping("/join")
     public String joinForm(Model model) {
@@ -36,41 +39,26 @@ public class MemberController {
     }
 
     @PostMapping("/join")
-    public String join(@Validated @ModelAttribute JoinForm joinForm, BindingResult bindingResult) {
+    public String join(@Validated @ModelAttribute JoinForm joinForm,
+                       BindingResult bindingResult,
+                       RedirectAttributes redirectAttributes) {
 
+        //아이디, 닉네임 중복 시 직접 field 에러에 추가
+        if (joinForm.getLoginId() != null && joinForm.getNickname() != null) {
+            if (memberService.existsLoginId(joinForm.getLoginId())) {
+                bindingResult.rejectValue("loginId", "exists", "이미 사용중인 아이디입니다.");
+            }
+            if (memberService.existsNickname(joinForm.getNickname())) {
+                bindingResult.rejectValue("nickname", "exists", "이미 사용중인 닉네임입니다.");
+            }
+        }
         if (bindingResult.hasErrors()) {
             return "members/join";
         }
 
-        Member findMember = memberRepository.findByLoginId(joinForm.getLoginId()).orElse(null);
-
-        if (findMember != null) {
-            bindingResult.reject("duplication err", "아이디 중복");
-            return "members/join";
-        }
-
-        Member member = new Member(
-                joinForm.getLoginId(),
-                joinForm.getPassword(),
-                joinForm.getName(),
-                joinForm.getNickname(),
-                joinForm.getEmail(),
-                joinForm.getCellPhone());
-        memberRepository.save(member);
+        JoinResponse joinResponse = memberService.join(joinForm);
+        redirectAttributes.addFlashAttribute("joinResponse", joinResponse);
         return "redirect:/login";
-    }
-
-    @PostMapping("/join/checkId")
-    @ResponseBody
-    public boolean checkId(@RequestParam("id") String id) {
-        boolean isDuplicate;
-        Member member = memberRepository.findByLoginId(id).orElse(null);
-        if (member == null) {
-            isDuplicate = false;
-        } else {
-            isDuplicate = true;
-        }
-        return isDuplicate;
     }
 
     // 회원 정보 조회
@@ -193,5 +181,4 @@ public class MemberController {
         memberRepository.delete(member);
         return "redirect:/member/logout";
     }
-
 }
