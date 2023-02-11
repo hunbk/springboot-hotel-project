@@ -28,6 +28,11 @@
                             <p id="password-error" th:if="${#fields.hasErrors('password')}" th:errors="*{password}">Incorrect date</p>
                         </div>
                         <div class="mb-3">
+                            <label for="passwordCheck">비밀번호 재확인</label>
+                            <input type="password" class="form-control" id="passwordCheck" th:field="*{passwordCheck}" placeholder="비밀번호 재확인 입력">
+                            <p id="passwordCheck-error" th:if="${#fields.hasErrors('passwordCheck')}" th:errors="*{passwordCheck}">Incorrect date</p>
+                        </div>
+                        <div class="mb-3">
                             <label for="name">이름</label>
                             <input type="text" class="form-control" id="name" th:field="*{name}" placeholder="이름 입력">
                             <p id="name-error" th:if="${#fields.hasErrors('name')}" th:errors="*{name}">Incorrect date</p>
@@ -99,6 +104,33 @@
         return message;
     }
 
+    function passwordDoubleCheck(element) {
+        let id = element.id;
+        let value = element.value;
+        let errorElement = document.getElementById(`${id}-error`);
+        if (errorElement == null) {
+            errorElement = document.createElement('p');
+            errorElement.setAttribute('id', `${id}-error`);
+            element.after(errorElement);
+        }
+        if (value === '') {
+            element.setAttribute('class', 'form-control is-invalid');
+            errorElement.style.display = 'block';
+            errorElement.textContent = '필수 정보입니다.';
+            return false;
+        }
+        if (password.value !== value) {
+            element.setAttribute('class', 'form-control is-invalid');
+            errorElement.style.display = 'block';
+            errorElement.textContent = '비밀번호가 일치하지 않습니다.';
+            return false;
+        }
+        //비밀번호 재확인 일치
+        errorElement.style.display = 'none';
+        element.setAttribute('class', 'form-control');
+        return true;
+    }
+
     function validate(element) {
         let id = element.id;
         let value = element.value;
@@ -163,6 +195,7 @@
 
     let loginId = document.getElementById('loginId');
     let password = document.getElementById('password');
+    let passwordCheck = document.getElementById('passwordCheck');
     let name = document.getElementById('name');
     let nickname = document.getElementById('nickname');
     let email = document.getElementById('email');
@@ -176,6 +209,9 @@
     email.addEventListener('focusout', e => validate(e.target));
     cellPhone.addEventListener('focusout', e => validate(e.target));
 
+    //비밀번호 재확인
+    passwordCheck.addEventListener('focusout', e => passwordDoubleCheck(e.target));
+
     //중복 체크 등록
     loginId.addEventListener('focusout', e => duplicateCheck(e.target));
     nickname.addEventListener('focusout', e => duplicateCheck(e.target));
@@ -188,7 +224,8 @@
         let b4 = validate(cellPhone);
         let b5 = validate(loginId) && await duplicateCheck(loginId);
         let b6 = validate(nickname) && await duplicateCheck(nickname);
-        return b1 && b2 && b3 && b4 && b5 && b6;
+        let b7 = passwordDoubleCheck(passwordCheck);
+        return b1 && b2 && b3 && b4 && b5 && b6 && b7;
     }
 
     let joinForm = document.getElementById('joinForm');

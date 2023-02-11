@@ -43,7 +43,11 @@ public class MemberController {
                        BindingResult bindingResult,
                        RedirectAttributes redirectAttributes) {
 
-        //아이디, 닉네임 중복 시 직접 field 에러에 추가
+        //비밀번호 재확인 불일치
+        if (!joinForm.getPassword().equals(joinForm.getPasswordCheck())) {
+            bindingResult.rejectValue("passwordCheck", "notSame", "비밀번호가 일치하지 않습니다.");
+        }
+        //아이디, 닉네임 중복
         if (joinForm.getLoginId() != null && joinForm.getNickname() != null) {
             if (memberService.existsLoginId(joinForm.getLoginId())) {
                 bindingResult.rejectValue("loginId", "exists", "이미 사용중인 아이디입니다.");
