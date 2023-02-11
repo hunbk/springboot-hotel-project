@@ -27,7 +27,7 @@ public class Member {
     @Size(min = 5, max = 20)
     private String loginId;
 
-    @Column(nullable = false, length = 30, unique = true)
+    @Column(nullable = false, length = 30)
     @Size(min = 8, max = 30)
     private String password;
 
