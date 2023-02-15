@@ -1,7 +1,9 @@
 package com.ptbh.kyungsunghotel.web.member;
 
-import com.ptbh.kyungsunghotel.domain.board.Board;
+import com.ptbh.kyungsunghotel.domain.board.BoardDto;
+import com.ptbh.kyungsunghotel.domain.board.BoardService;
 import com.ptbh.kyungsunghotel.domain.member.Member;
+import com.ptbh.kyungsunghotel.domain.member.MemberDto;
 import com.ptbh.kyungsunghotel.domain.member.MemberRepository;
 import com.ptbh.kyungsunghotel.domain.member.MemberService;
 import com.ptbh.kyungsunghotel.domain.reserve.Reserve;
@@ -11,14 +13,16 @@ import com.ptbh.kyungsunghotel.web.SessionConstants;
 import com.ptbh.kyungsunghotel.web.auth.LoginForm;
 import com.ptbh.kyungsunghotel.web.reserve.ReserveForm;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.data.web.SortDefault;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.SessionAttribute;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.ArrayList;
@@ -31,6 +35,7 @@ public class MemberController {
     private final MemberRepository memberRepository;
     private final ReserveRepository reserveRepository;
     private final MemberService memberService;
+    private final BoardService boardService;
 
     @GetMapping("/join")
     public String joinForm(Model model) {
@@ -65,13 +70,32 @@ public class MemberController {
         return "redirect:/login";
     }
 
-    // 회원 정보 조회
-    @GetMapping("/member/info")
-    public String showMemberInfo(@SessionAttribute(value = SessionConstants.LOGIN_MEMBER, required = false) Member member, Model model) {
-        List<Board> boards = memberRepository.findByLoginId(member.getLoginId()).orElse(null).getBoards();
-        boards.sort((o1, o2) -> (int) (o2.getId() - o1.getId()));
+    //프로필(닉네임, 게시글)
+    @GetMapping("/members/{memberId}")
+    public String profile(@PathVariable Long memberId,
+                       @SortDefault(sort = "id", direction = Sort.Direction.DESC) @PageableDefault Pageable pageable,
+                       Model model) {
 
-        List<Reserve> reserves = memberRepository.findByLoginId(member.getLoginId()).orElse(null).getReserves();
+        MemberDto memberDto = memberService.findByMemberId(memberId);
+        Page<BoardDto> boardPage = boardService.findBoardsByMemberNickname(memberDto.getNickname(), pageable);
+
+        //프로필 정보는 id와 닉네임만 필요하므로 따로, 혹은 MemberInfo 등의 객체로 넘겨줄 것.
+        model.addAttribute("memberId", memberDto.getId());
+        model.addAttribute("nickname", memberDto.getNickname());
+        model.addAttribute("boardPage", boardPage);
+        return "members/profile";
+    }
+
+    //내 계정 및 예약조회
+    @GetMapping("/account")
+    public String account(@SessionAttribute(name = SessionConstants.LOGIN_MEMBER, required = false) Member member,
+                          Model model) {
+
+        if (member == null) {
+            return "redirect:/login";
+        }
+
+        List<Reserve> reserves = memberRepository.findById(member.getId()).orElse(null).getReserves();
         List<ReserveForm> list = new ArrayList<>();
 
         reserves = reserves.stream().filter(ReserveService.distinctByKey(Reserve::getReserveId)).collect(Collectors.toList());
@@ -79,6 +103,7 @@ public class MemberController {
             ReserveForm reserveForm = new ReserveForm();
             reserveForm.setId(reserve.getId());
             reserveForm.setCheckIn(reserve.getDate());
+            //TODO: 잘못된 설계. 예약 도메인 리팩토링 필요.
             reserveForm.setCheckOut(reserve.getDate().plusDays(reserveRepository.countByReserveId(reserve.getReserveId())));
             reserveForm.setRoomNo(reserve.getRoom().getRoomNo());
             reserveForm.setName(reserve.getMember().getName());
@@ -87,11 +112,10 @@ public class MemberController {
             list.add(reserveForm);
         }
 
-//        model.addAttribute("reserves", reserves);
+        MemberDto memberDto = memberService.findByMemberId(member.getId());
+        model.addAttribute("memberDto", memberDto);
         model.addAttribute("reserves", list);
-        model.addAttribute("boards", boards);
-        model.addAttribute("member", member);
-        return "members/memberInfo";
+        return "members/account";
     }
 
     // 회원 정보 수정
@@ -119,7 +143,7 @@ public class MemberController {
         member.update(updateForm.getName(), updateForm.getNickname(), updateForm.getEmail(), updateForm.getCellPhone());
 
         memberRepository.save(member);
-        return "redirect:/member/info";
+        return "redirect:/account";
     }
 
     @GetMapping("/member/changePassword")
@@ -183,6 +207,7 @@ public class MemberController {
         }
 
         memberRepository.delete(member);
+        //TODO: 세션 처리 후 홈으로
         return "redirect:/member/logout";
     }
 }

@@ -37,7 +37,7 @@
                 <p th:text="${reserve.reservePrice}"></p>
             </div>
             <div style="text-align: end; margin: 20px;">
-                <button type="button"  class="btn btn-outline-secondary" onclick="location.href='/member/info';" >마이페이지</button>
+                <button type="button" class="btn btn-outline-secondary" onclick="location.href='/account';" >마이페이지</button>
                 <button type="button" class="btn btn-dark" th:onclick="|location.href='@{/reserve/reserveDelete/{id}(id=${reserve.id})}'|">예약 취소</button>
             </div>
         </div>

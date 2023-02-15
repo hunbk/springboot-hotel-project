@@ -36,6 +36,11 @@ public class BoardService {
         return BoardDto.from(foundBoard);
     }
 
+    public Page<BoardDto> findBoardsByMemberNickname(String nickname, Pageable pageable) {
+        return boardRepository.findByMember_Nickname(nickname, pageable)
+                .map(BoardDto::from);
+    }
+
     public Page<BoardDto> findBoards(PageRequestDto pageRequestDto) {
         //정렬 조건
         Sort sort = Sort.by(Sort.Direction.DESC, "id");

@@ -55,7 +55,7 @@ public class ReserveController {
             reserve.setReserveId(l);
             reserveRepository.save(reserve);
         }
-        return "redirect:/member/info";
+        return "redirect:/account";
     }
 
     @GetMapping("/reserve/searchRoom")
@@ -96,6 +96,6 @@ public class ReserveController {
 
         Reserve reserve = reserveRepository.findById(id).orElse(null);
         reserveRepository.deleteByReserveId(reserve.getReserveId());
-        return "redirect:/member/info";
+        return "redirect:/account";
     }
 }

@@ -11,9 +11,10 @@
             <h4 class="text-center">회원 정보</h4>
         </div>
         <div class="card-body">
-            <p>이름: <span th:text="${member.name}"></span></p>
-            <p>이메일: <span th:text="${member.email}"></span></p>
-            <p>전화번호: <span th:text="${member.getCellPhone}"></span></p>
+            <p>이름: <span th:text="${memberDto.name}"></span></p>
+            <p>닉네임: <span th:text="${memberDto.nickname}"></span></p>
+            <p>이메일: <span th:text="${memberDto.email}"></span></p>
+            <p>전화번호: <span th:text="${memberDto.getCellPhone}"></span></p>
             <div style="text-align: end;">
                 <button type="button" class="btn btn-dark" th:onclick="|location.href='@{/member/update}'|">정보 수정</button>
                 <button type="button" class="btn btn-dark" th:onclick="|location.href='@{/member/changePassword}'|">비밀번호 변경</button>
@@ -34,7 +35,6 @@
                     <th scope="col">체크인</th>
                     <th scope="col">체크아웃</th>
                     <th scope="col">예약자</th>
-
                 </tr>
                 </thead>
                 <tr scope="row" th:each="reserve : ${reserves}">
@@ -46,28 +46,7 @@
             </table>
         </div>
     </div>
-
-    <div class="card mt-5" style="width: 900px; margin-bottom: 150px;">
-        <div class="card-header">
-            <h4 class="text-center">내가 쓴 글</h4>
-        </div>
-        <div class="card-body">
-            <table class="table table-hover">
-                <thead>
-                <tr>
-                    <th scope="col" style="width: 80%;">제목</th>
-                    <th scope="col">작성일</th>
-                </tr>
-                </thead>
-                <tr scope="row" th:each="board : ${boards}">
-                    <td><a th:href="@{/boards/{id}(id=${board.id})}" th:text="${board.title}"></a></td>
-                    <td th:text="${#temporals.format(board.createdDate, 'yyyy-MM-dd HH:mm:ss')}"></td>
-                </tr>
-            </table>
-        </div>
-    </div>
 </div>
-
 <div th:replace="fragments/footer :: footer"></div>
 </body>
 </html>

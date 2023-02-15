@@ -1,5 +1,6 @@
 package com.ptbh.kyungsunghotel.domain.member;
 
+import com.ptbh.kyungsunghotel.exception.member.NoSuchMemberException;
 import com.ptbh.kyungsunghotel.web.member.JoinForm;
 import com.ptbh.kyungsunghotel.web.member.JoinResponse;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +26,12 @@ public class MemberService {
                 .build();
         Member savedMember = memberRepository.save(member);
         return JoinResponse.from(savedMember);
+    }
+
+    public MemberDto findByMemberId(Long memberId) {
+        Member foundMember = memberRepository.findById(memberId)
+                .orElseThrow(NoSuchMemberException::new);
+        return MemberDto.from(foundMember);
     }
 
     public boolean existsLoginId(String loginId) {
