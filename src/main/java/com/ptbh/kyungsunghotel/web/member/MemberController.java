@@ -73,8 +73,8 @@ public class MemberController {
     //프로필(닉네임, 게시글)
     @GetMapping("/members/{memberId}")
     public String profile(@PathVariable Long memberId,
-                       @SortDefault(sort = "id", direction = Sort.Direction.DESC) @PageableDefault Pageable pageable,
-                       Model model) {
+                          @SortDefault(sort = "id", direction = Sort.Direction.DESC) @PageableDefault Pageable pageable,
+                          Model model) {
 
         MemberDto memberDto = memberService.findByMemberId(memberId);
         Page<BoardDto> boardPage = boardService.findBoardsByMemberNickname(memberDto.getNickname(), pageable);
