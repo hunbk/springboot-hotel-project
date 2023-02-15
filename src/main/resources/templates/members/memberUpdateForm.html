@@ -13,29 +13,29 @@
                     <h4 class="text-center">회원 정보 수정</h4>
                 </div>
                 <div class="card-body">
-                    <form th:action="@{/member/update}" th:object="${updateForm}" method="post">
+                    <form id="memberUpdateForm" th:action="@{/account/update}" th:object="${memberUpdateForm}" method="post">
                         <div class="mb-3" th:if="${#fields.hasGlobalErrors()}">
                             <p th:each="err : ${#fields.globalErrors()}" th:text="${err}">전체 오류 메시지</p>
                         </div>
                         <div class="mb-3">
-                            <label class="form-label" th:for="name">이름</label>
-                            <input type="text" class="form-control" name="name" th:field="*{name}" placeholder="이름 입력" required>
-                            <p th:if="${#fields.hasErrors('name')}" th:errors="*{name}">Incorrect date</p>
+                            <label class="form-label" for="name">이름</label>
+                            <input type="text" class="form-control" id="name" th:field="*{name}" placeholder="이름 입력">
+                            <p id="name-error" style="display: none">필수 정보입니다.</p>
                         </div>
                         <div class="mb-3">
-                            <label class="form-label" th:for="nickname">닉네임</label>
-                            <input type="text" class="form-control" name="nickname" th:field="*{nickname}" placeholder="닉네임 입력" required>
-                            <p th:if="${#fields.hasErrors('nickname')}" th:errors="*{nickname}">Incorrect date</p>
+                            <label class="form-label" for="nickname">닉네임</label>
+                            <input type="text" class="form-control" id="nickname" th:data-my-nickname="${memberUpdateForm.nickname}" th:field="*{nickname}" placeholder="닉네임 입력">
+                            <p id="nickname-error" style="display: none">필수 정보입니다.</p>
                         </div>
                         <div class="mb-3">
-                            <label class="form-label" th:for="email">이메일</label>
-                            <input type="email" class="form-control" name="email" th:field="*{email}" placeholder="이메일 입력" required>
-                            <p th:if="${#fields.hasErrors('email')}" th:errors="*{email}">Incorrect date</p>
+                            <label class="form-label" for="email">이메일</label>
+                            <input type="email" class="form-control" id="email" th:field="*{email}" placeholder="이메일 입력">
+                            <p id="email-error" style="display: none">필수 정보입니다.</p>
                         </div>
                         <div class="mb-3">
-                            <label class="form-label" th:for="cellPhone">전화번호</label>
-                            <input type="text" class="form-control" name="cellPhone" th:field="*{cellPhone}" placeholder="전화번호 입력" required>
-                            <p th:if="${#fields.hasErrors('cellPhone')}" th:errors="*{cellPhone}">Incorrect date</p>
+                            <label class="form-label" for="cellPhone">전화번호</label>
+                            <input type="text" class="form-control" id="cellPhone" th:field="*{cellPhone}" placeholder="전화번호 입력">
+                            <p id="cellPhone-error" style="display: none">필수 정보입니다.</p>
                         </div>
                         <div class="d-grid">
                             <button type="submit" class="btn btn-dark mb-2">수정</button>
@@ -48,5 +48,121 @@
     </div>
 </div>
 <div th:replace="fragments/footer :: footer"></div>
+<script>
+    const nameRegexp = /^[a-zA-Z가-힣]{1,10}$/;
+    const nicknameRegexp = /^[\da-zA-Zㄱ-힣]{2,12}$/;
+    const emailRegexp = /^(?!.*(\.\.|\\\\|\s)).+@[\da-zA-Z.\-]+\.[\da-zA-Z]+$/;
+    const cellPhoneRegexp = /^01[016-9]\d{3,4}\d{4}$/;
+
+    function getRegexp(id) {
+        if (id === 'name') {
+            return new RegExp(nameRegexp);
+        } else if (id === 'nickname') {
+            return new RegExp(nicknameRegexp);
+        } else if (id === 'email') {
+            return new RegExp(emailRegexp);
+        } else if (id === 'cellPhone') {
+            return new RegExp(cellPhoneRegexp);
+        }
+    }
+
+    function getMessage(id) {
+        let message = '';
+        if (id === 'name') {
+            message = '한글과 영어 대 소문자만 사용 가능합니다. (특수문자, 공백 사용 불가)';
+        } else if (id === 'nickname') {
+            message = '2~12자의 한글과 영어 대 소문자, 숫자만 사용 가능합니다. (특수문자, 공백 사용 불가)';
+        } else if (id === 'email') {
+            message = '올바른 이메일 형식을 입력해주세요.';
+        } else if (id === 'cellPhone') {
+            message = '잘못된 형식의 전화번호입니다.';
+        }
+        return message;
+    }
+
+    function validate(element) {
+        let id = element.id;
+        let value = element.value;
+        let regexp = getRegexp(id);
+        let errorElement = document.getElementById(`${id}-error`);
+        if (value === '') {
+            element.setAttribute('class', 'form-control is-invalid');
+            errorElement.style.display = 'block';
+            errorElement.textContent = '필수 정보입니다.';
+            return false;
+        }
+        if (!regexp.test(value)) {
+            element.setAttribute('class', 'form-control is-invalid');
+            errorElement.style.display = 'block';
+            errorElement.textContent = getMessage(id);
+            return false;
+        }
+
+        //유효성 검증 성공
+        errorElement.style.display = 'none';
+        element.setAttribute('class', 'form-control');
+        return true;
+    }
+
+    async function nicknameDuplicateCheck(element) {
+        let id = element.id;
+        let value = element.value;
+        let myNickname = element.dataset.myNickname;
+        let regexp = getRegexp(id);
+        let errorElement = document.getElementById(`${id}-error`);
+
+        //유효성 검증 실패
+        if (value === '' || !regexp.test(value)) {
+            return false;
+        }
+        //닉네임 변경 안할 시 검증 통과
+        if (value === myNickname) {
+            return true;
+        }
+
+        let exists = await fetch('/api/members/validations?' + new URLSearchParams(`${id}=${value}`))
+            .then(response => response.json());
+        if (exists) {
+            element.setAttribute('class', 'form-control is-invalid');
+            errorElement.style.display = 'block';
+            errorElement.textContent = `이미 사용중인 닉네임입니다.`;
+            return false;
+        }
+
+        //중복 체크 통과
+        element.setAttribute('class', 'form-control is-valid');
+        errorElement.style.display = 'block';
+        errorElement.textContent = `사용 가능한 닉네임입니다.`;
+        return true;
+    }
+
+    let name = document.getElementById('name');
+    let nickname = document.getElementById('nickname');
+    let email = document.getElementById('email');
+    let cellPhone = document.getElementById('cellPhone');
+
+    name.addEventListener('focusout', e => validate(e.target));
+    nickname.addEventListener('focusout', e => validate(e.target));
+    nickname.addEventListener('focusout', e => nicknameDuplicateCheck(e.target));
+    email.addEventListener('focusout', e => validate(e.target));
+    cellPhone.addEventListener('focusout', e => validate(e.target));
+
+    //폼 전송 검증
+    async function validateFormComplete() {
+        let b1 = validate(name);
+        let b2 = validate(email);
+        let b3 = validate(cellPhone);
+        let b4 = validate(nickname) && await nicknameDuplicateCheck(nickname);
+        return b1 && b2 && b3 && b4;
+    }
+
+    let memberUpdateForm = document.getElementById('memberUpdateForm');
+    memberUpdateForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        if (await validateFormComplete()) {
+            memberUpdateForm.submit();
+        }
+    });
+</script>
 </body>
 </html>

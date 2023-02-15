@@ -118,31 +118,48 @@ public class MemberController {
         return "members/account";
     }
 
-    // 회원 정보 수정
-    @GetMapping("/member/update")
-    public String showMemberUpdateForm(@SessionAttribute(value = SessionConstants.LOGIN_MEMBER, required = false) Member member, Model model) {
-        UpdateForm updateForm = new UpdateForm();
-        updateForm.setName(member.getName());
-        updateForm.setNickname(member.getNickname());
-        updateForm.setEmail(member.getEmail());
-        updateForm.setCellPhone(member.getCellPhone());
-        model.addAttribute("updateForm", updateForm);
+    @GetMapping("/account/update")
+    public String MemberUpdateForm(@SessionAttribute(value = SessionConstants.LOGIN_MEMBER, required = false) Member member,
+                                   Model model) {
+
+        if (member == null) {
+            return "redirect:/login";
+        }
+
+        MemberDto memberDto = memberService.findByMemberId(member.getId());
+        MemberUpdateForm memberUpdateForm = MemberUpdateForm.from(memberDto);
+        model.addAttribute("memberUpdateForm", memberUpdateForm);
         return "members/memberUpdateForm";
     }
 
-    // 매개변수 순서를 지키지 않으면 @Validated 검증을 받을 수 없음!!
-    // @Validated, BindingResult 를 순서대로 선언
-    @PostMapping("/member/update")
-    public String updateMember(@Validated UpdateForm updateForm,
+    @PostMapping("/account/update")
+    public String updateMember(@Validated @ModelAttribute MemberUpdateForm memberUpdateForm,
                                BindingResult bindingResult,
                                @SessionAttribute(value = SessionConstants.LOGIN_MEMBER, required = false) Member member) {
+
+        if (member == null) {
+            return "redirect:/login";
+        }
+
+        //닉네임을 수정한 경우만 중복 검증
+        if (!memberUpdateForm.getNickname().equals(member.getNickname())) {
+            if (memberService.existsNickname(memberUpdateForm.getNickname())) {
+                bindingResult.rejectValue("nickname", "exists", "이미 사용중인 닉네임입니다.");
+            }
+        }
         if (bindingResult.hasErrors()) {
             return "members/memberUpdateForm";
         }
 
-        member.update(updateForm.getName(), updateForm.getNickname(), updateForm.getEmail(), updateForm.getCellPhone());
+        memberService.updateMember(member.getId(), memberUpdateForm);
+        //TODO: 세션의 member도 업데이트함. 세션에 엔티티를 넣는건 위험하므로 AuthInfo 객체로 리팩토링
+        member.update(
+                memberUpdateForm.getName(),
+                memberUpdateForm.getNickname(),
+                memberUpdateForm.getEmail(),
+                memberUpdateForm.getCellPhone()
+        );
 
-        memberRepository.save(member);
         return "redirect:/account";
     }
 

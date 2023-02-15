@@ -3,6 +3,7 @@ package com.ptbh.kyungsunghotel.domain.member;
 import com.ptbh.kyungsunghotel.exception.member.NoSuchMemberException;
 import com.ptbh.kyungsunghotel.web.member.JoinForm;
 import com.ptbh.kyungsunghotel.web.member.JoinResponse;
+import com.ptbh.kyungsunghotel.web.member.MemberUpdateForm;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,6 +33,18 @@ public class MemberService {
         Member foundMember = memberRepository.findById(memberId)
                 .orElseThrow(NoSuchMemberException::new);
         return MemberDto.from(foundMember);
+    }
+
+    @Transactional
+    public void updateMember(Long memberId, MemberUpdateForm memberUpdateForm) {
+        Member foundMember = memberRepository.findById(memberId)
+                .orElseThrow(NoSuchMemberException::new);
+        foundMember.update(
+                memberUpdateForm.getName(),
+                memberUpdateForm.getNickname(),
+                memberUpdateForm.getEmail(),
+                memberUpdateForm.getCellPhone()
+        );
     }
 
     public boolean existsLoginId(String loginId) {
