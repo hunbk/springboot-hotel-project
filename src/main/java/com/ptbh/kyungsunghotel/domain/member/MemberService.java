@@ -1,6 +1,7 @@
 package com.ptbh.kyungsunghotel.domain.member;
 
 import com.ptbh.kyungsunghotel.exception.member.NoSuchMemberException;
+import com.ptbh.kyungsunghotel.web.member.ChangePasswordForm;
 import com.ptbh.kyungsunghotel.web.member.JoinForm;
 import com.ptbh.kyungsunghotel.web.member.JoinResponse;
 import com.ptbh.kyungsunghotel.web.member.MemberUpdateForm;
@@ -47,11 +48,24 @@ public class MemberService {
         );
     }
 
+    @Transactional
+    public void changePassword(Long memberId, ChangePasswordForm changePasswordForm) {
+        Member foundMember = memberRepository.findById(memberId)
+                .orElseThrow(NoSuchMemberException::new);
+        foundMember.changePassword(changePasswordForm.getNewPassword());
+    }
+
     public boolean existsLoginId(String loginId) {
         return memberRepository.existsByLoginId(loginId);
     }
 
     public boolean existsNickname(String nickname) {
         return memberRepository.existsByNickname(nickname);
+    }
+
+    public boolean verifyPassword(Long memberId, String password) {
+        Member foundMember = memberRepository.findById(memberId)
+                .orElseThrow(NoSuchMemberException::new);
+        return foundMember.verifyPassword(password);
     }
 }

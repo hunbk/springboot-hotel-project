@@ -17,7 +17,7 @@
             <p>전화번호: <span th:text="${memberDto.getCellPhone}"></span></p>
             <div style="text-align: end;">
                 <button type="button" class="btn btn-dark" th:onclick="|location.href='@{/account/update}'|">정보 수정</button>
-                <button type="button" class="btn btn-dark" th:onclick="|location.href='@{/member/changePassword}'|">비밀번호 변경</button>
+                <button type="button" class="btn btn-dark" th:onclick="|location.href='@{/account/change-password}'|">비밀번호 변경</button>
                 <button type="button" class="btn btn-dark" onclick="location.href='/member/withdraw';">회원 탈퇴</button>
             </div>
         </div>

@@ -1,4 +1,3 @@
-
 package com.ptbh.kyungsunghotel.domain.member;
 
 import com.ptbh.kyungsunghotel.domain.board.Board;
@@ -75,5 +74,9 @@ public class Member {
 
     public void changePassword(String newPassword) {
         this.password = newPassword;
+    }
+
+    public boolean verifyPassword(String password) {
+        return this.password.equals(password);
     }
 }

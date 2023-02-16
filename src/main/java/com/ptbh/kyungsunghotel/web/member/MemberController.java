@@ -163,36 +163,47 @@ public class MemberController {
         return "redirect:/account";
     }
 
-    @GetMapping("/member/changePassword")
-    public String showChangePasswordForm(Model model) {
-        model.addAttribute("passwordForm", new PasswordForm());
+    @GetMapping("/account/change-password")
+    public String changePasswordForm(@SessionAttribute(value = SessionConstants.LOGIN_MEMBER, required = false) Member member,
+                                     Model model) {
+
+        if (member == null) {
+            return "redirect:/login";
+        }
+
+        model.addAttribute("changePasswordForm", new ChangePasswordForm());
         return "members/changePasswordForm";
     }
 
-    // 매개변수 순서를 지키지 않으면 @Validated 검증을 받을 수 없음!!
-    // @Validated, BindingResult 를 순서대로 선언
-    @PostMapping("/member/changePassword")
-    public String changePassword(@Validated PasswordForm passwordForm,
+    @PostMapping("/account/change-password")
+    public String changePassword(@Validated @ModelAttribute ChangePasswordForm changePasswordForm,
                                  BindingResult bindingResult,
-                                 @SessionAttribute(value = SessionConstants.LOGIN_MEMBER, required = false) Member member
-    ) {
+                                 @SessionAttribute(value = SessionConstants.LOGIN_MEMBER, required = false) Member member) {
+
+        if (member == null) {
+            return "redirect:/login";
+        }
+
+        if (!bindingResult.hasFieldErrors()) {
+            if (!memberService.verifyPassword(member.getId(), changePasswordForm.getCurrentPassword())) {
+                bindingResult.reject("currentPasswordNotMatch", "현재 비밀번호가 일치하지 않습니다.");
+            }
+            if (!changePasswordForm.getNewPassword().equals(changePasswordForm.getNewPasswordCheck())) {
+                bindingResult.reject("newPasswordNotMatch", "새 비밀번호가 일치하지 않습니다.");
+            }
+            if (changePasswordForm.getCurrentPassword().equals(changePasswordForm.getNewPassword())) {
+                bindingResult.reject("samePassword", "현재 사용하시는 비밀번호입니다. 새 비밀번호를 입력해주세요.");
+            }
+        }
         if (bindingResult.hasErrors()) {
             return "members/changePasswordForm";
         }
 
-        if (!passwordForm.getOldPassword().equals(member.getPassword())) {
-            bindingResult.reject("incorrectPassword", "기존 비밀번호가 일치하지 않습니다.");
-            return "members/changePasswordForm";
-        }
+        memberService.changePassword(member.getId(), changePasswordForm);
+        //TODO: 세션의 member도 업데이트함. 세션에 엔티티를 넣는건 위험하므로 AuthInfo 객체로 리팩토링
+        member.changePassword(changePasswordForm.getNewPassword());
 
-        if (!passwordForm.getNewPassword().equals(passwordForm.getCheckNewPassword())) {
-            bindingResult.reject("differentNewPassword", "새 비밀번호가 일치하지 않습니다.");
-            return "members/changePasswordForm";
-        }
-
-        member.changePassword(passwordForm.getNewPassword());
-        memberRepository.save(member);
-        return "redirect:/";
+        return "redirect:/account";
     }
 
     // 회원 탈퇴
