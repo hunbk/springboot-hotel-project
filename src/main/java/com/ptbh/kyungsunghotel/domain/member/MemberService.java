@@ -55,6 +55,11 @@ public class MemberService {
         foundMember.changePassword(changePasswordForm.getNewPassword());
     }
 
+    @Transactional
+    public void deleteByMemberId(Long memberId) {
+        memberRepository.deleteById(memberId);
+    }
+
     public boolean existsLoginId(String loginId) {
         return memberRepository.existsByLoginId(loginId);
     }

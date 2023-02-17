@@ -10,7 +10,6 @@ import com.ptbh.kyungsunghotel.domain.reserve.Reserve;
 import com.ptbh.kyungsunghotel.domain.reserve.ReserveRepository;
 import com.ptbh.kyungsunghotel.domain.reserve.ReserveService;
 import com.ptbh.kyungsunghotel.web.SessionConstants;
-import com.ptbh.kyungsunghotel.web.auth.LoginForm;
 import com.ptbh.kyungsunghotel.web.reserve.ReserveForm;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -20,13 +19,18 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.data.web.SortDefault;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Controller
@@ -206,36 +210,44 @@ public class MemberController {
         return "redirect:/account";
     }
 
-    // 회원 탈퇴
-    @GetMapping("/member/withdraw")
-    public String showWithdraw(Model model) {
-        model.addAttribute("loginForm", new LoginForm());
+    //회원 탈퇴
+    @GetMapping("/account/withdraw")
+    public String withdrawForm(@SessionAttribute(value = SessionConstants.LOGIN_MEMBER, required = false) Member member) {
+        if (member == null) {
+            return "redirect:/login";
+        }
+
         return "members/withdraw";
     }
 
-    @PostMapping("/member/withdraw")
-    public String withdraw(@Validated LoginForm loginForm,
-                           BindingResult bindingResult,
-                           @SessionAttribute(value = SessionConstants.LOGIN_MEMBER, required = false) Member member) {
-        if (bindingResult.hasErrors()) {
-            System.out.println("################ has errors");
+    @PostMapping("/account/withdraw")
+    public String withdraw(@RequestParam String password,
+                           @SessionAttribute(value = SessionConstants.LOGIN_MEMBER, required = false) Member member,
+                           HttpServletRequest request,
+                           Model model) {
+
+        if (member == null) {
+            return "redirect:/login";
+        }
+
+        Map<String, String> errors = new HashMap<>();
+        if (!StringUtils.hasText(password)) {
+            errors.put("required", "비밀번호는 필수입니다.");
+        }
+        if (errors.isEmpty() && !memberService.verifyPassword(member.getId(), password)) {
+            errors.put("globalError", "비밀번호가 일치하지 않습니다.");
+        }
+        if (!errors.isEmpty()) {
+            model.addAttribute("errors", errors);
             return "members/withdraw";
         }
 
-        if (!member.getLoginId().equals(loginForm.getLoginId())) {
-            System.out.println("################ loginIdFail");
-            bindingResult.reject("loginIdFail", "아이디가 일치하지 않습니다.");
-            return "members/withdraw";
-        }
+        memberService.deleteByMemberId(member.getId());
 
-        if (!member.getPassword().equals(loginForm.getPassword())) {
-            System.out.println("################ passwordFail");
-            bindingResult.reject("passwordFail", "비밀번호가 일치하지 않습니다.");
-            return "members/withdraw";
+        HttpSession session = request.getSession(false);
+        if (session != null) {
+            session.invalidate();
         }
-
-        memberRepository.delete(member);
-        //TODO: 세션 처리 후 홈으로
-        return "redirect:/member/logout";
+        return "redirect:/";
     }
 }

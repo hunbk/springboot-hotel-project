@@ -12,23 +12,16 @@
                 <div class="card-header">
                     <h4 class="text-center">회원 탈퇴</h4>
                 </div>
-                    <h5 style="margin: 20px;">아이디, 비밀번호를 입력하면 회원 탈퇴가 진행됩니다.</h5>
+                    <h5 style="margin: 20px;">비밀번호를 입력하면 회원 탈퇴가 진행됩니다.</h5>
                 <div class="card-body">
-                    <form th:action="@{/member/withdraw}" th:object="${loginForm}" method="post">
-                        <div class="mb-3" th:if="${#fields.hasGlobalErrors()}">
-                            <p th:each="err : ${#fields.globalErrors()}" th:text="${err}">전체 오류 메시지</p>
+                    <form th:action="@{/account/withdraw}" method="post">
+                        <div class="mb-3" th:if="${errors?.containsKey('globalError')}">
+                            <p th:text="${errors['globalError']}">오류 메시지</p>
                         </div>
                         <div class="mb-3">
-                            <input type="text" class="form-control" name="loginId" th:field="*{loginId}" placeholder="아이디 입력" required>
-                            <p th:if="${#fields.hasErrors('loginId')}" th:errors="*{loginId}">Incorrect date</p>
+                            <input type="password" class="form-control" id="password" name="password" placeholder="비밀번호 입력">
+                            <p th:if="${errors?.containsKey('required')}" th:text="${errors['required']}"></p>
                         </div>
-                        <div class="mb-3">
-                            <div>
-                                <input type="password" class="form-control" name="password" th:field="*{password}" placeholder="비밀번호 입력" required>
-                                <p th:if="${#fields.hasErrors('password')}" th:errors="*{password}">Incorrect date</p>
-                            </div>
-                        </div>
-
                         <div class="d-grid">
                             <button type="submit" class="btn btn-dark mb-2">탈퇴</button>
                             <button type="button" class="btn btn-outline-secondary" onclick="location.href='/account';">취소</button>
