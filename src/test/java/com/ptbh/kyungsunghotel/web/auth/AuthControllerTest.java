@@ -89,5 +89,4 @@ class AuthControllerTest {
                 .andExpect(model().attributeExists("loginForm"))
                 .andExpect(model().attributeHasFieldErrorCode("loginForm", "password", "NotBlank"));
     }
-
 }

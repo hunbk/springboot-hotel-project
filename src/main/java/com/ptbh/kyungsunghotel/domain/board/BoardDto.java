@@ -38,5 +38,4 @@ public class BoardDto {
                 board.getModifiedDate()
         );
     }
-
 }

@@ -165,5 +165,4 @@ class BoardControllerTest {
                 .andDo(print())
                 .andExpect(status().isNoContent());
     }
-
 }

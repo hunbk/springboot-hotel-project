@@ -19,5 +19,4 @@ public class AuthService {
                 .filter(m -> m.getPassword().equals(loginForm.getPassword()))
                 .orElse(null);
     }
-
 }

@@ -99,5 +99,4 @@ class BoardRepositoryTest {
         //then
         assertThat(result.size()).isEqualTo(2);
     }
-
 }

@@ -69,5 +69,4 @@ class AuthServiceTest {
                 .cellPhone(CELLPHONE)
                 .build();
     }
-
 }
