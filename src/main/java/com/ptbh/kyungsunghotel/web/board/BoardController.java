@@ -1,9 +1,9 @@
 package com.ptbh.kyungsunghotel.web.board;
 
+import com.ptbh.kyungsunghotel.domain.auth.AuthInfo;
 import com.ptbh.kyungsunghotel.domain.board.BoardDto;
 import com.ptbh.kyungsunghotel.domain.board.BoardService;
 import com.ptbh.kyungsunghotel.domain.board.SearchType;
-import com.ptbh.kyungsunghotel.domain.member.Member;
 import com.ptbh.kyungsunghotel.web.SessionConstants;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -47,13 +47,13 @@ public class BoardController {
     public String savePost(@Validated @ModelAttribute PostSaveForm postSaveForm,
                            BindingResult bindingResult,
                            //TODO @LoginMember 어노테이션으로 개선
-                           @SessionAttribute(value = SessionConstants.LOGIN_MEMBER, required = false) Member member) {
+                           @SessionAttribute(value = SessionConstants.AUTH_INFO, required = false) AuthInfo authInfo) {
 
         if (bindingResult.hasErrors()) {
             return "boards/postSave";
         }
 
-        boardService.saveBoard(member.getId(), postSaveForm);
+        boardService.saveBoard(authInfo.getId(), postSaveForm);
 
         return "redirect:/boards";
     }

@@ -1,5 +1,6 @@
 package com.ptbh.kyungsunghotel.web.board;
 
+import com.ptbh.kyungsunghotel.domain.auth.AuthInfo;
 import com.ptbh.kyungsunghotel.domain.board.BoardRepository;
 import com.ptbh.kyungsunghotel.domain.board.BoardService;
 import com.ptbh.kyungsunghotel.domain.member.Member;
@@ -74,10 +75,11 @@ class BoardControllerTest {
 
     @Test
     void 게시판_작성요청_성공() throws Exception {
+        AuthInfo authInfo = new AuthInfo(member.getId(), NICKNAME);
         mockMvc.perform(post("/boards/save")
                         .param("title", "제목")
                         .param("content", "내용")
-                        .sessionAttr(SessionConstants.LOGIN_MEMBER, member))
+                        .sessionAttr(SessionConstants.AUTH_INFO, authInfo))
                 .andDo(print())
                 .andExpect(status().is3xxRedirection())
                 .andExpect(handler().methodName("savePost"))
@@ -87,10 +89,11 @@ class BoardControllerTest {
 
     @Test
     void 게시판_작성요청_실패() throws Exception {
+        AuthInfo authInfo = new AuthInfo(member.getId(), NICKNAME);
         mockMvc.perform(post("/boards/save")
                         .param("title", "")
                         .param("content", "")
-                        .sessionAttr(SessionConstants.LOGIN_MEMBER, member))
+                        .sessionAttr(SessionConstants.AUTH_INFO, authInfo))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(handler().methodName("savePost"))

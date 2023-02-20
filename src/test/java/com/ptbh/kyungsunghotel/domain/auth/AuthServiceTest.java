@@ -35,12 +35,12 @@ class AuthServiceTest {
                 .willReturn(Optional.ofNullable(member));
 
         //when
-        Member loginMember = authService.login(loginForm);
+        AuthInfo authInfo = authService.login(loginForm);
 
         //then
-        assertThat(loginMember).isNotNull();
-        assertThat(loginMember.getLoginId()).isEqualTo(loginForm.getLoginId());
-        assertThat(loginMember.getPassword()).isEqualTo(loginForm.getPassword());
+        assertThat(authInfo).isNotNull();
+        assertThat(authInfo.getId()).isEqualTo(member.getId());
+        assertThat(authInfo.getNickname()).isEqualTo(member.getNickname());
     }
 
     @Test
@@ -53,14 +53,15 @@ class AuthServiceTest {
                 .willReturn(Optional.ofNullable(member));
 
         //when
-        Member loginMember = authService.login(loginForm);
+        AuthInfo authInfo = authService.login(loginForm);
 
         //then
-        assertThat(loginMember).isNull();
+        assertThat(authInfo).isNull();
     }
 
     public Member member() {
         return Member.builder()
+                .id(1L)
                 .loginId(LOGIN_ID)
                 .password(PASSWORD)
                 .name(NAME)

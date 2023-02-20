@@ -1,8 +1,8 @@
 package com.ptbh.kyungsunghotel.web.member;
 
+import com.ptbh.kyungsunghotel.domain.auth.AuthInfo;
 import com.ptbh.kyungsunghotel.domain.board.BoardDto;
 import com.ptbh.kyungsunghotel.domain.board.BoardService;
-import com.ptbh.kyungsunghotel.domain.member.Member;
 import com.ptbh.kyungsunghotel.domain.member.MemberDto;
 import com.ptbh.kyungsunghotel.domain.member.MemberRepository;
 import com.ptbh.kyungsunghotel.domain.member.MemberService;
@@ -92,14 +92,14 @@ public class MemberController {
 
     //내 계정 및 예약조회
     @GetMapping("/account")
-    public String account(@SessionAttribute(name = SessionConstants.LOGIN_MEMBER, required = false) Member member,
+    public String account(@SessionAttribute(name = SessionConstants.AUTH_INFO, required = false) AuthInfo authInfo,
                           Model model) {
 
-        if (member == null) {
+        if (authInfo == null) {
             return "redirect:/login";
         }
 
-        List<Reserve> reserves = memberRepository.findById(member.getId()).orElse(null).getReserves();
+        List<Reserve> reserves = memberRepository.findById(authInfo.getId()).orElse(null).getReserves();
         List<ReserveForm> list = new ArrayList<>();
 
         reserves = reserves.stream().filter(ReserveService.distinctByKey(Reserve::getReserveId)).collect(Collectors.toList());
@@ -116,21 +116,21 @@ public class MemberController {
             list.add(reserveForm);
         }
 
-        MemberDto memberDto = memberService.findByMemberId(member.getId());
+        MemberDto memberDto = memberService.findByMemberId(authInfo.getId());
         model.addAttribute("memberDto", memberDto);
         model.addAttribute("reserves", list);
         return "members/account";
     }
 
     @GetMapping("/account/update")
-    public String MemberUpdateForm(@SessionAttribute(value = SessionConstants.LOGIN_MEMBER, required = false) Member member,
+    public String MemberUpdateForm(@SessionAttribute(value = SessionConstants.AUTH_INFO, required = false) AuthInfo authInfo,
                                    Model model) {
 
-        if (member == null) {
+        if (authInfo == null) {
             return "redirect:/login";
         }
 
-        MemberDto memberDto = memberService.findByMemberId(member.getId());
+        MemberDto memberDto = memberService.findByMemberId(authInfo.getId());
         MemberUpdateForm memberUpdateForm = MemberUpdateForm.from(memberDto);
         model.addAttribute("memberUpdateForm", memberUpdateForm);
         return "members/memberUpdateForm";
@@ -139,14 +139,15 @@ public class MemberController {
     @PostMapping("/account/update")
     public String updateMember(@Validated @ModelAttribute MemberUpdateForm memberUpdateForm,
                                BindingResult bindingResult,
-                               @SessionAttribute(value = SessionConstants.LOGIN_MEMBER, required = false) Member member) {
+                               @SessionAttribute(value = SessionConstants.AUTH_INFO, required = false) AuthInfo authInfo,
+                               HttpServletRequest request) {
 
-        if (member == null) {
+        if (authInfo == null) {
             return "redirect:/login";
         }
 
         //닉네임을 수정한 경우만 중복 검증
-        if (!memberUpdateForm.getNickname().equals(member.getNickname())) {
+        if (!memberUpdateForm.getNickname().equals(authInfo.getNickname())) {
             if (memberService.existsNickname(memberUpdateForm.getNickname())) {
                 bindingResult.rejectValue("nickname", "exists", "이미 사용중인 닉네임입니다.");
             }
@@ -155,23 +156,22 @@ public class MemberController {
             return "members/memberUpdateForm";
         }
 
-        memberService.updateMember(member.getId(), memberUpdateForm);
-        //TODO: 세션의 member도 업데이트함. 세션에 엔티티를 넣는건 위험하므로 AuthInfo 객체로 리팩토링
-        member.update(
-                memberUpdateForm.getName(),
-                memberUpdateForm.getNickname(),
-                memberUpdateForm.getEmail(),
-                memberUpdateForm.getCellPhone()
-        );
+        memberService.updateMember(authInfo.getId(), memberUpdateForm);
+
+        //세션의 AuthInfo도 업데이트함.
+        HttpSession session = request.getSession(false);
+        if (session != null) {
+            session.setAttribute(SessionConstants.AUTH_INFO, new AuthInfo(authInfo.getId(), memberUpdateForm.getNickname()));
+        }
 
         return "redirect:/account";
     }
 
     @GetMapping("/account/change-password")
-    public String changePasswordForm(@SessionAttribute(value = SessionConstants.LOGIN_MEMBER, required = false) Member member,
+    public String changePasswordForm(@SessionAttribute(value = SessionConstants.AUTH_INFO, required = false) AuthInfo authInfo,
                                      Model model) {
 
-        if (member == null) {
+        if (authInfo == null) {
             return "redirect:/login";
         }
 
@@ -182,14 +182,14 @@ public class MemberController {
     @PostMapping("/account/change-password")
     public String changePassword(@Validated @ModelAttribute ChangePasswordForm changePasswordForm,
                                  BindingResult bindingResult,
-                                 @SessionAttribute(value = SessionConstants.LOGIN_MEMBER, required = false) Member member) {
+                                 @SessionAttribute(value = SessionConstants.AUTH_INFO, required = false) AuthInfo authInfo) {
 
-        if (member == null) {
+        if (authInfo == null) {
             return "redirect:/login";
         }
 
         if (!bindingResult.hasFieldErrors()) {
-            if (!memberService.verifyPassword(member.getId(), changePasswordForm.getCurrentPassword())) {
+            if (!memberService.verifyPassword(authInfo.getId(), changePasswordForm.getCurrentPassword())) {
                 bindingResult.reject("currentPasswordNotMatch", "현재 비밀번호가 일치하지 않습니다.");
             }
             if (!changePasswordForm.getNewPassword().equals(changePasswordForm.getNewPasswordCheck())) {
@@ -203,17 +203,15 @@ public class MemberController {
             return "members/changePasswordForm";
         }
 
-        memberService.changePassword(member.getId(), changePasswordForm);
-        //TODO: 세션의 member도 업데이트함. 세션에 엔티티를 넣는건 위험하므로 AuthInfo 객체로 리팩토링
-        member.changePassword(changePasswordForm.getNewPassword());
+        memberService.changePassword(authInfo.getId(), changePasswordForm);
 
         return "redirect:/account";
     }
 
     //회원 탈퇴
     @GetMapping("/account/withdraw")
-    public String withdrawForm(@SessionAttribute(value = SessionConstants.LOGIN_MEMBER, required = false) Member member) {
-        if (member == null) {
+    public String withdrawForm(@SessionAttribute(value = SessionConstants.AUTH_INFO, required = false) AuthInfo authInfo) {
+        if (authInfo == null) {
             return "redirect:/login";
         }
 
@@ -222,11 +220,11 @@ public class MemberController {
 
     @PostMapping("/account/withdraw")
     public String withdraw(@RequestParam String password,
-                           @SessionAttribute(value = SessionConstants.LOGIN_MEMBER, required = false) Member member,
+                           @SessionAttribute(value = SessionConstants.AUTH_INFO, required = false) AuthInfo authInfo,
                            HttpServletRequest request,
                            Model model) {
 
-        if (member == null) {
+        if (authInfo == null) {
             return "redirect:/login";
         }
 
@@ -234,7 +232,7 @@ public class MemberController {
         if (!StringUtils.hasText(password)) {
             errors.put("required", "비밀번호는 필수입니다.");
         }
-        if (errors.isEmpty() && !memberService.verifyPassword(member.getId(), password)) {
+        if (errors.isEmpty() && !memberService.verifyPassword(authInfo.getId(), password)) {
             errors.put("globalError", "비밀번호가 일치하지 않습니다.");
         }
         if (!errors.isEmpty()) {
@@ -242,7 +240,7 @@ public class MemberController {
             return "members/withdraw";
         }
 
-        memberService.deleteByMemberId(member.getId());
+        memberService.deleteByMemberId(authInfo.getId());
 
         HttpSession session = request.getSession(false);
         if (session != null) {

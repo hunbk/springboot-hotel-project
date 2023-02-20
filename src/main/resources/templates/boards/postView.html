@@ -30,10 +30,10 @@
     <br>
     <div class="container" style="text-align: right; width: 900px; margin-bottom: 150px;">
         <button type="button" class="btn btn-outline-secondary" onclick="location.href='/boards';" >목록</button>
-        <th:block th:if="${session.loginMember != null and #strings.equals(session.loginMember.id, board.memberId)}">
+        <th:block th:if="${session.authInfo != null and #strings.equals(session.authInfo.nickname, board.writer)}">
             <button type="button" class="btn btn-outline-danger" id="delete-button">삭제</button>
         </th:block>
-        <th:block th:if="${session.loginMember != null and #strings.equals(session.loginMember.id, board.memberId)}">
+        <th:block th:if="${session.authInfo != null and #strings.equals(session.authInfo.nickname, board.writer)}">
             <button type="button" class="btn btn-dark" th:onclick="|location.href='@{/boards/{boardId}/update(boardId=${board.id})}'|">수정</button>
         </th:block>
     </div>

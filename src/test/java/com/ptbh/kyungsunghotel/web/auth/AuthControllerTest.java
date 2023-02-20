@@ -73,7 +73,7 @@ class AuthControllerTest {
                         .param("password", "qwer"))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(request().sessionAttributeDoesNotExist(SessionConstants.LOGIN_MEMBER))
+                .andExpect(request().sessionAttributeDoesNotExist(SessionConstants.AUTH_INFO))
                 .andExpect(model().attributeExists("loginForm"))
                 .andExpect(model().attributeHasErrors("loginForm"));
     }
@@ -85,7 +85,7 @@ class AuthControllerTest {
                         .param("password", ""))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(request().sessionAttributeDoesNotExist(SessionConstants.LOGIN_MEMBER))
+                .andExpect(request().sessionAttributeDoesNotExist(SessionConstants.AUTH_INFO))
                 .andExpect(model().attributeExists("loginForm"))
                 .andExpect(model().attributeHasFieldErrorCode("loginForm", "password", "NotBlank"));
     }

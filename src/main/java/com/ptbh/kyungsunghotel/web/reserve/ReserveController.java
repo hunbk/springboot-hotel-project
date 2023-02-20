@@ -1,8 +1,11 @@
 package com.ptbh.kyungsunghotel.web.reserve;
 
+import com.ptbh.kyungsunghotel.domain.auth.AuthInfo;
 import com.ptbh.kyungsunghotel.domain.member.Member;
+import com.ptbh.kyungsunghotel.domain.member.MemberRepository;
 import com.ptbh.kyungsunghotel.domain.reserve.Reserve;
 import com.ptbh.kyungsunghotel.domain.reserve.ReserveRepository;
+import com.ptbh.kyungsunghotel.exception.member.NoSuchMemberException;
 import com.ptbh.kyungsunghotel.web.SessionConstants;
 import com.ptbh.kyungsunghotel.domain.room.Room;
 import com.ptbh.kyungsunghotel.domain.room.RoomRepository;
@@ -20,10 +23,12 @@ import java.util.List;
 public class ReserveController {
     private final RoomRepository roomRepository;
     private final ReserveRepository reserveRepository;
+    private final MemberRepository memberRepository;
 
-    public ReserveController(RoomRepository roomRepository, ReserveRepository reserveRepository) {
+    public ReserveController(RoomRepository roomRepository, ReserveRepository reserveRepository, MemberRepository memberRepository) {
         this.roomRepository = roomRepository;
         this.reserveRepository = reserveRepository;
+        this.memberRepository = memberRepository;
     }
 
     @GetMapping("/reserve")
@@ -37,8 +42,10 @@ public class ReserveController {
                           @RequestParam("roomNo") String roomNo,
                           @RequestParam("personnel") Integer personnel,
                           @RequestParam("reservePrice") Integer reservePrice,
-                          @SessionAttribute(value = SessionConstants.LOGIN_MEMBER, required = false) Member member) {
+                          @SessionAttribute(value = SessionConstants.AUTH_INFO, required = false) AuthInfo authInfo) {
 
+        Member member = memberRepository.findById(authInfo.getId())
+                .orElseThrow(NoSuchMemberException::new);
         Long l = Long.parseLong("0");
         for (long day = 0; day < ChronoUnit.DAYS.between(checkIn, checkOut); day++) {
             Reserve reserve = new Reserve();

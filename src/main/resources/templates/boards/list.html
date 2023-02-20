@@ -33,7 +33,7 @@
                 </table>
             </div>
         </div>
-        <div th:if ="${session.loginMember != null}" style="text-align: right">
+        <div th:if ="${session.authInfo != null}" style="text-align: right">
             <button class="btn btn-dark" onclick="location.href='/boards/save'">글작성</button>
         </div>
         <!-- 페이지 버튼 영역 시작 -->

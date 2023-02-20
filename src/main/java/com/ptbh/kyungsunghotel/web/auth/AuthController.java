@@ -1,7 +1,7 @@
 package com.ptbh.kyungsunghotel.web.auth;
 
+import com.ptbh.kyungsunghotel.domain.auth.AuthInfo;
 import com.ptbh.kyungsunghotel.domain.auth.AuthService;
-import com.ptbh.kyungsunghotel.domain.member.Member;
 import com.ptbh.kyungsunghotel.web.SessionConstants;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
@@ -36,8 +36,8 @@ public class AuthController {
             return "login";
         }
 
-        Member loginMember = authService.login(loginForm);
-        if (loginMember == null) {
+        AuthInfo authInfo = authService.login(loginForm);
+        if (authInfo == null) {
             bindingResult.reject("idOrPasswordMismatch", "아이디 또는 비밀번호가 일치하지 않습니다. 입력하신 내용을 다시 확인해주세요.");
             if (loginForm.getLoginId().contains(" ")) {
                 loginForm.setLoginId("");
@@ -46,7 +46,7 @@ public class AuthController {
         }
 
         HttpSession session = request.getSession();
-        session.setAttribute(SessionConstants.LOGIN_MEMBER, loginMember); //TODO: 세션에 저장할 엔티티를 별도의 인증 객체로 대체
+        session.setAttribute(SessionConstants.AUTH_INFO, authInfo);
 
         return "redirect:/";
     }

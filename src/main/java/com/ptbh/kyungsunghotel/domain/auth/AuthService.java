@@ -1,6 +1,5 @@
 package com.ptbh.kyungsunghotel.domain.auth;
 
-import com.ptbh.kyungsunghotel.domain.member.Member;
 import com.ptbh.kyungsunghotel.domain.member.MemberRepository;
 import com.ptbh.kyungsunghotel.web.auth.LoginForm;
 import lombok.RequiredArgsConstructor;
@@ -14,9 +13,10 @@ public class AuthService {
 
     private final MemberRepository memberRepository;
 
-    public Member login(LoginForm loginForm) {
+    public AuthInfo login(LoginForm loginForm) {
         return memberRepository.findByLoginId(loginForm.getLoginId())
                 .filter(m -> m.getPassword().equals(loginForm.getPassword()))
+                .map(AuthInfo::from)
                 .orElse(null);
     }
 }
