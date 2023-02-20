@@ -133,7 +133,7 @@ public class MemberController {
         MemberDto memberDto = memberService.findByMemberId(authInfo.getId());
         MemberUpdateForm memberUpdateForm = MemberUpdateForm.from(memberDto);
         model.addAttribute("memberUpdateForm", memberUpdateForm);
-        return "members/memberUpdateForm";
+        return "members/memberUpdate";
     }
 
     @PostMapping("/account/update")
@@ -153,7 +153,7 @@ public class MemberController {
             }
         }
         if (bindingResult.hasErrors()) {
-            return "members/memberUpdateForm";
+            return "members/memberUpdate";
         }
 
         memberService.updateMember(authInfo.getId(), memberUpdateForm);
@@ -176,7 +176,7 @@ public class MemberController {
         }
 
         model.addAttribute("changePasswordForm", new ChangePasswordForm());
-        return "members/changePasswordForm";
+        return "members/changePassword";
     }
 
     @PostMapping("/account/change-password")
@@ -200,7 +200,7 @@ public class MemberController {
             }
         }
         if (bindingResult.hasErrors()) {
-            return "members/changePasswordForm";
+            return "members/changePassword";
         }
 
         memberService.changePassword(authInfo.getId(), changePasswordForm);
