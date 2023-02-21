@@ -45,4 +45,13 @@ public class JoinForm {
             message = "잘못된 형식의 전화번호입니다.")
     private String cellPhone;
 
+    public JoinForm(String loginId, String password, String passwordCheck, String name, String nickname, String email, String cellPhone) {
+        this.loginId = loginId;
+        this.password = password;
+        this.passwordCheck = passwordCheck;
+        this.name = name;
+        this.nickname = nickname;
+        this.email = email;
+        this.cellPhone = cellPhone;
+    }
 }

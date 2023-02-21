@@ -1,6 +1,7 @@
 package com.ptbh.kyungsunghotel.web.member;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.validation.constraints.NotBlank;
@@ -8,6 +9,7 @@ import javax.validation.constraints.Pattern;
 
 @Getter
 @Setter
+@NoArgsConstructor
 public class ChangePasswordForm {
 
     @NotBlank(message = "현재 비밀번호는 필수입니다.")
@@ -21,4 +23,9 @@ public class ChangePasswordForm {
     @NotBlank(message = "새 비밀번호 재확인은 필수입니다.")
     private String newPasswordCheck;
 
+    public ChangePasswordForm(String currentPassword, String newPassword, String newPasswordCheck) {
+        this.currentPassword = currentPassword;
+        this.newPassword = newPassword;
+        this.newPasswordCheck = newPasswordCheck;
+    }
 }
