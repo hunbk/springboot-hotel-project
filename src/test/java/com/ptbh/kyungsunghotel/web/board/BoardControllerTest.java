@@ -65,7 +65,9 @@ class BoardControllerTest {
 
     @Test
     void 게시판_작성화면() throws Exception {
-        mockMvc.perform(get("/boards/save"))
+        AuthInfo authInfo = new AuthInfo(member.getId(), member.getNickname());
+        mockMvc.perform(get("/boards/save")
+                        .sessionAttr(SessionConstants.AUTH_INFO, authInfo))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(handler().methodName("postSaveForm"))
@@ -75,7 +77,7 @@ class BoardControllerTest {
 
     @Test
     void 게시판_작성요청_성공() throws Exception {
-        AuthInfo authInfo = new AuthInfo(member.getId(), NICKNAME);
+        AuthInfo authInfo = new AuthInfo(member.getId(), member.getNickname());
         mockMvc.perform(post("/boards/save")
                         .param("title", "제목")
                         .param("content", "내용")
@@ -89,7 +91,7 @@ class BoardControllerTest {
 
     @Test
     void 게시판_작성요청_실패() throws Exception {
-        AuthInfo authInfo = new AuthInfo(member.getId(), NICKNAME);
+        AuthInfo authInfo = new AuthInfo(member.getId(), member.getNickname());
         mockMvc.perform(post("/boards/save")
                         .param("title", "")
                         .param("content", "")
@@ -106,12 +108,14 @@ class BoardControllerTest {
     @Test
     void 게시판_수정화면() throws Exception {
         //given
+        AuthInfo authInfo = new AuthInfo(member.getId(), member.getNickname());
         PostSaveForm postSaveForm = new PostSaveForm("제목", "내용");
         Long boardId = boardService.saveBoard(member.getId(), postSaveForm);
         String url = "/boards/" + boardId + "/update";
 
         //when, then
-        mockMvc.perform(get(url))
+        mockMvc.perform(get(url)
+                        .sessionAttr(SessionConstants.AUTH_INFO, authInfo))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(handler().methodName("postUpdateForm"))
@@ -122,6 +126,7 @@ class BoardControllerTest {
     @Test
     void 게시판_수정요청_성공() throws Exception {
         //given
+        AuthInfo authInfo = new AuthInfo(member.getId(), member.getNickname());
         PostSaveForm postSaveForm = new PostSaveForm("제목", "내용");
         Long boardId = boardService.saveBoard(member.getId(), postSaveForm);
         String url = "/boards/" + boardId + "/update";
@@ -129,7 +134,8 @@ class BoardControllerTest {
         //when, then
         mockMvc.perform(put(url)
                         .param("title", "수정된 제목")
-                        .param("content", "수정된 내용"))
+                        .param("content", "수정된 내용")
+                        .sessionAttr(SessionConstants.AUTH_INFO, authInfo))
                 .andDo(print())
                 .andExpect(status().is3xxRedirection())
                 .andExpect(handler().methodName("updatePost"))
@@ -139,6 +145,7 @@ class BoardControllerTest {
     @Test
     void 게시판_수정요청_실패() throws Exception {
         //given
+        AuthInfo authInfo = new AuthInfo(member.getId(), member.getNickname());
         PostSaveForm postSaveForm = new PostSaveForm("제목", "내용");
         Long boardId = boardService.saveBoard(member.getId(), postSaveForm);
         String url = "/boards/" + boardId + "/update";
@@ -146,7 +153,8 @@ class BoardControllerTest {
         //when, then
         mockMvc.perform(put(url)
                         .param("title", "")
-                        .param("content", ""))
+                        .param("content", "")
+                        .sessionAttr(SessionConstants.AUTH_INFO, authInfo))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(handler().methodName("updatePost"))
@@ -159,12 +167,14 @@ class BoardControllerTest {
     @Test
     void 게시판_삭제요청() throws Exception {
         //given
+        AuthInfo authInfo = new AuthInfo(member.getId(), member.getNickname());
         PostSaveForm postSaveForm = new PostSaveForm("제목", "내용");
         Long boardId = boardService.saveBoard(member.getId(), postSaveForm);
         String url = "/boards/" + boardId;
 
         //when, then
-        mockMvc.perform(delete(url))
+        mockMvc.perform(delete(url)
+                        .sessionAttr(SessionConstants.AUTH_INFO, authInfo))
                 .andDo(print())
                 .andExpect(status().isNoContent());
     }

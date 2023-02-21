@@ -4,9 +4,11 @@ import com.ptbh.kyungsunghotel.domain.auth.AuthInfo;
 import com.ptbh.kyungsunghotel.domain.board.BoardDto;
 import com.ptbh.kyungsunghotel.domain.board.BoardService;
 import com.ptbh.kyungsunghotel.domain.board.SearchType;
+import com.ptbh.kyungsunghotel.exception.auth.NoAuthorityException;
 import com.ptbh.kyungsunghotel.web.SessionConstants;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -38,7 +40,13 @@ public class BoardController {
     }
 
     @GetMapping("/save")
-    public String postSaveForm(Model model) {
+    public String postSaveForm(@SessionAttribute(value = SessionConstants.AUTH_INFO, required = false) AuthInfo authInfo,
+                               Model model) {
+
+        if (authInfo == null) {
+            return "redirect:/login";
+        }
+
         model.addAttribute("postSaveForm", new PostSaveForm());
         return "boards/postSave";
     }
@@ -48,6 +56,10 @@ public class BoardController {
                            BindingResult bindingResult,
                            //TODO @LoginMember 어노테이션으로 개선
                            @SessionAttribute(value = SessionConstants.AUTH_INFO, required = false) AuthInfo authInfo) {
+
+        if (authInfo == null) {
+            return "redirect:/login";
+        }
 
         if (bindingResult.hasErrors()) {
             return "boards/postSave";
@@ -59,10 +71,18 @@ public class BoardController {
     }
 
     @GetMapping("/{boardId}/update")
-    public String postUpdateForm(@PathVariable Long boardId, Model model) {
-        BoardDto boardDto = boardService.findByBoardId(boardId);
-        PostUpdateForm postUpdateForm = PostUpdateForm.from(boardDto);
+    public String postUpdateForm(@PathVariable Long boardId,
+                                 @SessionAttribute(value = SessionConstants.AUTH_INFO, required = false) AuthInfo authInfo,
+                                 Model model) {
 
+        if (authInfo == null) {
+            return "redirect:/login";
+        }
+
+        BoardDto boardDto = boardService.findByBoardId(boardId);
+        authenticate(authInfo, boardDto.getWriter());
+
+        PostUpdateForm postUpdateForm = PostUpdateForm.from(boardDto);
         model.addAttribute("postUpdateForm", postUpdateForm);
 
         return "boards/postUpdate";
@@ -71,7 +91,15 @@ public class BoardController {
     @PutMapping("/{boardId}/update")
     public String updatePost(@PathVariable Long boardId,
                              @Validated @ModelAttribute PostUpdateForm postUpdateForm,
-                             BindingResult bindingResult) {
+                             BindingResult bindingResult,
+                             @SessionAttribute(value = SessionConstants.AUTH_INFO, required = false) AuthInfo authInfo) {
+
+        if (authInfo == null) {
+            return "redirect:/login";
+        }
+
+        BoardDto boardDto = boardService.findByBoardId(boardId);
+        authenticate(authInfo, boardDto.getWriter());
 
         if (bindingResult.hasErrors()) {
             return "boards/postUpdate";
@@ -84,8 +112,28 @@ public class BoardController {
 
     @DeleteMapping("/{boardId}")
     @ResponseBody
-    public ResponseEntity<Void> deletePost(@PathVariable Long boardId) {
+    public ResponseEntity<Void> deletePost(@PathVariable Long boardId,
+                                           @SessionAttribute(value = SessionConstants.AUTH_INFO, required = false) AuthInfo authInfo) {
+
+        BoardDto boardDto = boardService.findByBoardId(boardId);
+        if (authInfo == null || !authInfo.getNickname().equals(boardDto.getWriter())) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
         boardService.deleteBoard(boardId);
         return ResponseEntity.noContent().build();
+    }
+
+    private static void authenticate(AuthInfo authInfo, String writer) {
+        if (!authInfo.getNickname().equals(writer)) {
+            throw new NoAuthorityException();
+        }
+    }
+
+    //예외처리
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    @ExceptionHandler(NoAuthorityException.class)
+    public String NoAuthorityExceptionHandler() {
+        return "error/403";
     }
 }
