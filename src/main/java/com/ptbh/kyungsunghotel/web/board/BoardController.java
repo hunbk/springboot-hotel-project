@@ -5,7 +5,7 @@ import com.ptbh.kyungsunghotel.domain.board.BoardDto;
 import com.ptbh.kyungsunghotel.domain.board.BoardService;
 import com.ptbh.kyungsunghotel.domain.board.SearchType;
 import com.ptbh.kyungsunghotel.exception.auth.NoAuthorityException;
-import com.ptbh.kyungsunghotel.web.SessionConstants;
+import com.ptbh.kyungsunghotel.web.auth.Login;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -40,7 +40,7 @@ public class BoardController {
     }
 
     @GetMapping("/save")
-    public String postSaveForm(@SessionAttribute(value = SessionConstants.AUTH_INFO, required = false) AuthInfo authInfo,
+    public String postSaveForm(@Login AuthInfo authInfo,
                                Model model) {
 
         if (authInfo == null) {
@@ -54,8 +54,7 @@ public class BoardController {
     @PostMapping("/save")
     public String savePost(@Validated @ModelAttribute PostSaveForm postSaveForm,
                            BindingResult bindingResult,
-                           //TODO @LoginMember 어노테이션으로 개선
-                           @SessionAttribute(value = SessionConstants.AUTH_INFO, required = false) AuthInfo authInfo) {
+                           @Login AuthInfo authInfo) {
 
         if (authInfo == null) {
             return "redirect:/login";
@@ -72,7 +71,7 @@ public class BoardController {
 
     @GetMapping("/{boardId}/update")
     public String postUpdateForm(@PathVariable Long boardId,
-                                 @SessionAttribute(value = SessionConstants.AUTH_INFO, required = false) AuthInfo authInfo,
+                                 @Login AuthInfo authInfo,
                                  Model model) {
 
         if (authInfo == null) {
@@ -92,7 +91,7 @@ public class BoardController {
     public String updatePost(@PathVariable Long boardId,
                              @Validated @ModelAttribute PostUpdateForm postUpdateForm,
                              BindingResult bindingResult,
-                             @SessionAttribute(value = SessionConstants.AUTH_INFO, required = false) AuthInfo authInfo) {
+                             @Login AuthInfo authInfo) {
 
         if (authInfo == null) {
             return "redirect:/login";
@@ -113,7 +112,7 @@ public class BoardController {
     @DeleteMapping("/{boardId}")
     @ResponseBody
     public ResponseEntity<Void> deletePost(@PathVariable Long boardId,
-                                           @SessionAttribute(value = SessionConstants.AUTH_INFO, required = false) AuthInfo authInfo) {
+                                           @Login AuthInfo authInfo) {
 
         BoardDto boardDto = boardService.findByBoardId(boardId);
         if (authInfo == null || !authInfo.getNickname().equals(boardDto.getWriter())) {

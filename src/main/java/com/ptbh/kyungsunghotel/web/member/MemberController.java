@@ -10,6 +10,7 @@ import com.ptbh.kyungsunghotel.domain.reserve.Reserve;
 import com.ptbh.kyungsunghotel.domain.reserve.ReserveRepository;
 import com.ptbh.kyungsunghotel.domain.reserve.ReserveService;
 import com.ptbh.kyungsunghotel.web.SessionConstants;
+import com.ptbh.kyungsunghotel.web.auth.Login;
 import com.ptbh.kyungsunghotel.web.reserve.ReserveForm;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -123,7 +124,7 @@ public class MemberController {
     }
 
     @GetMapping("/account/update")
-    public String MemberUpdateForm(@SessionAttribute(value = SessionConstants.AUTH_INFO, required = false) AuthInfo authInfo,
+    public String MemberUpdateForm(@Login AuthInfo authInfo,
                                    Model model) {
 
         if (authInfo == null) {
@@ -139,7 +140,7 @@ public class MemberController {
     @PostMapping("/account/update")
     public String updateMember(@Validated @ModelAttribute MemberUpdateForm memberUpdateForm,
                                BindingResult bindingResult,
-                               @SessionAttribute(value = SessionConstants.AUTH_INFO, required = false) AuthInfo authInfo,
+                               @Login AuthInfo authInfo,
                                HttpServletRequest request) {
 
         if (authInfo == null) {
@@ -168,7 +169,7 @@ public class MemberController {
     }
 
     @GetMapping("/account/change-password")
-    public String changePasswordForm(@SessionAttribute(value = SessionConstants.AUTH_INFO, required = false) AuthInfo authInfo,
+    public String changePasswordForm(@Login AuthInfo authInfo,
                                      Model model) {
 
         if (authInfo == null) {
@@ -182,7 +183,7 @@ public class MemberController {
     @PostMapping("/account/change-password")
     public String changePassword(@Validated @ModelAttribute ChangePasswordForm changePasswordForm,
                                  BindingResult bindingResult,
-                                 @SessionAttribute(value = SessionConstants.AUTH_INFO, required = false) AuthInfo authInfo) {
+                                 @Login AuthInfo authInfo) {
 
         if (authInfo == null) {
             return "redirect:/login";
@@ -210,7 +211,7 @@ public class MemberController {
 
     //회원 탈퇴
     @GetMapping("/account/withdraw")
-    public String withdrawForm(@SessionAttribute(value = SessionConstants.AUTH_INFO, required = false) AuthInfo authInfo) {
+    public String withdrawForm(@Login AuthInfo authInfo) {
         if (authInfo == null) {
             return "redirect:/login";
         }
@@ -220,7 +221,7 @@ public class MemberController {
 
     @PostMapping("/account/withdraw")
     public String withdraw(@RequestParam String password,
-                           @SessionAttribute(value = SessionConstants.AUTH_INFO, required = false) AuthInfo authInfo,
+                           @Login AuthInfo authInfo,
                            HttpServletRequest request,
                            Model model) {
 
