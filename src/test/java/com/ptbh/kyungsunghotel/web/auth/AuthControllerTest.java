@@ -1,5 +1,6 @@
 package com.ptbh.kyungsunghotel.web.auth;
 
+import com.ptbh.kyungsunghotel.DatabaseCleaner;
 import com.ptbh.kyungsunghotel.domain.member.Member;
 import com.ptbh.kyungsunghotel.domain.member.MemberRepository;
 import com.ptbh.kyungsunghotel.web.SessionConstants;
@@ -26,6 +27,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class AuthControllerTest {
 
     @Autowired
+    private DatabaseCleaner databaseCleaner;
+
+    @Autowired
     private MemberRepository memberRepository;
 
     @Autowired
@@ -41,7 +45,7 @@ class AuthControllerTest {
 
     @AfterEach
     void clear() {
-        memberRepository.deleteAll();
+        databaseCleaner.execute();
     }
 
     @Test

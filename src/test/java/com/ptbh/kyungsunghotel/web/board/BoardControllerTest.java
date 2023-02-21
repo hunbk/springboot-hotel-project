@@ -1,7 +1,7 @@
 package com.ptbh.kyungsunghotel.web.board;
 
+import com.ptbh.kyungsunghotel.DatabaseCleaner;
 import com.ptbh.kyungsunghotel.domain.auth.AuthInfo;
-import com.ptbh.kyungsunghotel.domain.board.BoardRepository;
 import com.ptbh.kyungsunghotel.domain.board.BoardService;
 import com.ptbh.kyungsunghotel.domain.member.Member;
 import com.ptbh.kyungsunghotel.domain.member.MemberRepository;
@@ -28,10 +28,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class BoardControllerTest {
 
     @Autowired
-    private MemberRepository memberRepository;
+    private DatabaseCleaner databaseCleaner;
 
     @Autowired
-    private BoardRepository boardRepository;
+    private MemberRepository memberRepository;
 
     @Autowired
     private BoardService boardService;
@@ -49,8 +49,7 @@ class BoardControllerTest {
 
     @AfterEach
     void clear() {
-        boardRepository.deleteAll();
-        memberRepository.deleteAll();
+        databaseCleaner.execute();
     }
 
     @Test
