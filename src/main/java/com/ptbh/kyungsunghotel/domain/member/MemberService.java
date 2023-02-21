@@ -57,7 +57,9 @@ public class MemberService {
 
     @Transactional
     public void deleteByMemberId(Long memberId) {
-        memberRepository.deleteById(memberId);
+        Member foundMember = memberRepository.findById(memberId)
+                .orElseThrow(NoSuchMemberException::new);
+        memberRepository.delete(foundMember);
     }
 
     public boolean existsLoginId(String loginId) {
