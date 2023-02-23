@@ -96,10 +96,6 @@ public class MemberController {
     public String account(@SessionAttribute(name = SessionConstants.AUTH_INFO, required = false) AuthInfo authInfo,
                           Model model) {
 
-        if (authInfo == null) {
-            return "redirect:/login";
-        }
-
         List<Reserve> reserves = memberRepository.findById(authInfo.getId()).orElse(null).getReserves();
         List<ReserveForm> list = new ArrayList<>();
 
@@ -127,10 +123,6 @@ public class MemberController {
     public String MemberUpdateForm(@Login AuthInfo authInfo,
                                    Model model) {
 
-        if (authInfo == null) {
-            return "redirect:/login";
-        }
-
         MemberDto memberDto = memberService.findByMemberId(authInfo.getId());
         MemberUpdateForm memberUpdateForm = MemberUpdateForm.from(memberDto);
         model.addAttribute("memberUpdateForm", memberUpdateForm);
@@ -142,10 +134,6 @@ public class MemberController {
                                BindingResult bindingResult,
                                @Login AuthInfo authInfo,
                                HttpServletRequest request) {
-
-        if (authInfo == null) {
-            return "redirect:/login";
-        }
 
         //닉네임을 수정한 경우만 중복 검증
         if (!memberUpdateForm.getNickname().equals(authInfo.getNickname())) {
@@ -169,13 +157,7 @@ public class MemberController {
     }
 
     @GetMapping("/account/change-password")
-    public String changePasswordForm(@Login AuthInfo authInfo,
-                                     Model model) {
-
-        if (authInfo == null) {
-            return "redirect:/login";
-        }
-
+    public String changePasswordForm(Model model) {
         model.addAttribute("changePasswordForm", new ChangePasswordForm());
         return "members/changePassword";
     }
@@ -184,10 +166,6 @@ public class MemberController {
     public String changePassword(@Validated @ModelAttribute ChangePasswordForm changePasswordForm,
                                  BindingResult bindingResult,
                                  @Login AuthInfo authInfo) {
-
-        if (authInfo == null) {
-            return "redirect:/login";
-        }
 
         if (!bindingResult.hasFieldErrors()) {
             if (!memberService.verifyPassword(authInfo.getId(), changePasswordForm.getCurrentPassword())) {
@@ -211,11 +189,7 @@ public class MemberController {
 
     //회원 탈퇴
     @GetMapping("/account/withdraw")
-    public String withdrawForm(@Login AuthInfo authInfo) {
-        if (authInfo == null) {
-            return "redirect:/login";
-        }
-
+    public String withdrawForm() {
         return "members/withdraw";
     }
 
@@ -224,10 +198,6 @@ public class MemberController {
                            @Login AuthInfo authInfo,
                            HttpServletRequest request,
                            Model model) {
-
-        if (authInfo == null) {
-            return "redirect:/login";
-        }
 
         Map<String, String> errors = new HashMap<>();
         if (!StringUtils.hasText(password)) {

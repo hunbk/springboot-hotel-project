@@ -21,7 +21,7 @@
                     <div style="margin-bottom: 20px;">
                         <h4 class="text-center">로그인</h4>
                     </div>
-                    <form th:action="@{/login}" th:object="${loginForm}" method="post">
+                    <form th:object="${loginForm}" method="post">
                         <div class="form-outline mb-4">
                             <input type="text" name="loginId" class="form-control" th:field="*{loginId}" placeholder="아이디 입력" value="test1234">
                         </div>

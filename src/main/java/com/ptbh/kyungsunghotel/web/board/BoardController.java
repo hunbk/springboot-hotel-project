@@ -40,13 +40,7 @@ public class BoardController {
     }
 
     @GetMapping("/save")
-    public String postSaveForm(@Login AuthInfo authInfo,
-                               Model model) {
-
-        if (authInfo == null) {
-            return "redirect:/login";
-        }
-
+    public String postSaveForm(Model model) {
         model.addAttribute("postSaveForm", new PostSaveForm());
         return "boards/postSave";
     }
@@ -55,10 +49,6 @@ public class BoardController {
     public String savePost(@Validated @ModelAttribute PostSaveForm postSaveForm,
                            BindingResult bindingResult,
                            @Login AuthInfo authInfo) {
-
-        if (authInfo == null) {
-            return "redirect:/login";
-        }
 
         if (bindingResult.hasErrors()) {
             return "boards/postSave";
@@ -74,10 +64,6 @@ public class BoardController {
                                  @Login AuthInfo authInfo,
                                  Model model) {
 
-        if (authInfo == null) {
-            return "redirect:/login";
-        }
-
         BoardDto boardDto = boardService.findByBoardId(boardId);
         authenticate(authInfo, boardDto.getWriter());
 
@@ -92,10 +78,6 @@ public class BoardController {
                              @Validated @ModelAttribute PostUpdateForm postUpdateForm,
                              BindingResult bindingResult,
                              @Login AuthInfo authInfo) {
-
-        if (authInfo == null) {
-            return "redirect:/login";
-        }
 
         BoardDto boardDto = boardService.findByBoardId(boardId);
         authenticate(authInfo, boardDto.getWriter());

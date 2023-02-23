@@ -11,6 +11,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -30,6 +31,7 @@ public class AuthController {
     @PostMapping("/login")
     public String login(@Validated @ModelAttribute LoginForm loginForm,
                         BindingResult bindingResult,
+                        @RequestParam(defaultValue = "/") String redirectURL,
                         HttpServletRequest request) {
 
         if (bindingResult.hasErrors()) {
@@ -48,7 +50,7 @@ public class AuthController {
         HttpSession session = request.getSession();
         session.setAttribute(SessionConstants.AUTH_INFO, authInfo);
 
-        return "redirect:/";
+        return "redirect:" + redirectURL;
     }
 
     @PostMapping("/logout")
