@@ -9,6 +9,7 @@ import com.ptbh.kyungsunghotel.domain.member.MemberService;
 import com.ptbh.kyungsunghotel.domain.reserve.Reserve;
 import com.ptbh.kyungsunghotel.domain.reserve.ReserveRepository;
 import com.ptbh.kyungsunghotel.domain.reserve.ReserveService;
+import com.ptbh.kyungsunghotel.exception.member.NoSuchMemberException;
 import com.ptbh.kyungsunghotel.web.SessionConstants;
 import com.ptbh.kyungsunghotel.web.auth.Login;
 import com.ptbh.kyungsunghotel.web.reserve.ReserveForm;
@@ -18,6 +19,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.data.web.SortDefault;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
@@ -76,7 +78,7 @@ public class MemberController {
     }
 
     //프로필(닉네임, 게시글)
-    @GetMapping("/members/{memberId}")
+    @GetMapping("/members/{memberId:\\d+}")
     public String profile(@PathVariable Long memberId,
                           @SortDefault(sort = "id", direction = Sort.Direction.DESC) @PageableDefault Pageable pageable,
                           Model model) {
@@ -218,5 +220,13 @@ public class MemberController {
             session.invalidate();
         }
         return "redirect:/";
+    }
+
+    //예외처리
+    //TODO: ControllerAdvice에 적용
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ExceptionHandler(NoSuchMemberException.class)
+    public String noSuchMemberException() {
+        return "error/404";
     }
 }

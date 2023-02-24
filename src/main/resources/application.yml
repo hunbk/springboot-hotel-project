@@ -4,6 +4,13 @@ server:
       tracking-modes: cookie # URL에 JSESSIONID가 붙어서 나가는 설정을 해제
 
 spring:
+  web:
+    resources:
+      # ResourceHttpRequestHandler를 매핑하지 않음. 인터셉터 적용 시 404에러를 출력하기 위해서 false로 설정하였음.
+      # 이 옵션을 사용 시 static에 있는 resource를 찾지 못함.
+      # resource를 사용하는 경우, WebMvcConfigurer의 addResourceHandlers에 등록할 것.
+      add-mappings: false
+
   mvc:
     hiddenmethod:
       filter:

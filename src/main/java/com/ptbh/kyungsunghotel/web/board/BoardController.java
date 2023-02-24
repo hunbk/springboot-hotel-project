@@ -5,6 +5,7 @@ import com.ptbh.kyungsunghotel.domain.board.BoardDto;
 import com.ptbh.kyungsunghotel.domain.board.BoardService;
 import com.ptbh.kyungsunghotel.domain.board.SearchType;
 import com.ptbh.kyungsunghotel.exception.auth.NoAuthorityException;
+import com.ptbh.kyungsunghotel.exception.board.NoSuchBoardException;
 import com.ptbh.kyungsunghotel.web.auth.Login;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -32,7 +33,7 @@ public class BoardController {
         return "boards/list";
     }
 
-    @GetMapping("/{boardId}")
+    @GetMapping("/{boardId:\\d+}")
     public String postView(@PathVariable Long boardId, Model model) {
         BoardDto boardDto = boardService.findByBoardId(boardId);
         model.addAttribute("board", boardDto);
@@ -97,8 +98,13 @@ public class BoardController {
                                            @Login AuthInfo authInfo) {
 
         BoardDto boardDto = boardService.findByBoardId(boardId);
-        if (authInfo == null || !authInfo.getNickname().equals(boardDto.getWriter())) {
+        //비로그인
+        if (authInfo == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        //삭제권한없음
+        if (!authInfo.getNickname().equals(boardDto.getWriter())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
 
         boardService.deleteBoard(boardId);
@@ -112,9 +118,16 @@ public class BoardController {
     }
 
     //예외처리
+    //TODO: ControllerAdvice에 적용
     @ResponseStatus(HttpStatus.FORBIDDEN)
     @ExceptionHandler(NoAuthorityException.class)
-    public String NoAuthorityExceptionHandler() {
+    public String noAuthorityExceptionHandler() {
         return "error/403";
+    }
+
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ExceptionHandler(NoSuchBoardException.class)
+    public String noSuchBoardException() {
+        return "error/404";
     }
 }

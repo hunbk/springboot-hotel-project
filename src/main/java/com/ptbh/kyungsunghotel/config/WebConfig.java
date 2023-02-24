@@ -1,14 +1,13 @@
 package com.ptbh.kyungsunghotel.config;
 
-import com.ptbh.kyungsunghotel.web.auth.AuthFilter;
+import com.ptbh.kyungsunghotel.web.auth.AuthInterceptor;
 import com.ptbh.kyungsunghotel.web.auth.LoginInfoArgumentResolver;
-import org.springframework.boot.web.servlet.FilterRegistrationBean;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-import javax.servlet.Filter;
 import java.util.List;
 
 @Configuration
@@ -19,11 +18,19 @@ public class WebConfig implements WebMvcConfigurer {
         resolvers.add(new LoginInfoArgumentResolver());
     }
 
-    @Bean
-    public FilterRegistrationBean authFilter() {
-        FilterRegistrationBean<Filter> filterRegistrationBean = new FilterRegistrationBean<>();
-        filterRegistrationBean.setFilter(new AuthFilter());
-        filterRegistrationBean.addUrlPatterns("/*");
-        return filterRegistrationBean;
+    @Override
+    public void addInterceptors(InterceptorRegistry registry) {
+        registry.addInterceptor(new AuthInterceptor())
+                .addPathPatterns("/**")
+                .excludePathPatterns("/", "/boards", "/boards/{id:\\d+}", "/members/{id:\\d+}",
+                        "/login", "/logout", "/join", "/css/**", "/img/**", "/*.ico", "/error");
+    }
+
+    @Override
+    public void addResourceHandlers(ResourceHandlerRegistry registry) {
+        registry.addResourceHandler("/css/**")
+                .addResourceLocations("classpath:/static/css/");
+        registry.addResourceHandler("/img/**")
+                .addResourceLocations("classpath:/static/img/");
     }
 }
