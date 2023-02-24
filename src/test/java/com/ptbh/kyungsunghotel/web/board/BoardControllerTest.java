@@ -40,11 +40,13 @@ class BoardControllerTest {
     private MockMvc mockMvc;
 
     private Member member;
+    private AuthInfo authInfo;
 
     @BeforeEach
     void setup() {
         member = new Member(LOGIN_ID, PASSWORD, NAME, NICKNAME, EMAIL, CELLPHONE);
         memberRepository.save(member);
+        authInfo = new AuthInfo(member.getId(), member.getNickname());
     }
 
     @AfterEach
@@ -64,7 +66,6 @@ class BoardControllerTest {
 
     @Test
     void 게시판_작성화면() throws Exception {
-        AuthInfo authInfo = new AuthInfo(member.getId(), member.getNickname());
         mockMvc.perform(get("/boards/save")
                         .sessionAttr(SessionConstants.AUTH_INFO, authInfo))
                 .andDo(print())
@@ -75,8 +76,15 @@ class BoardControllerTest {
     }
 
     @Test
+    void 게시판_작성화면_비로그인() throws Exception {
+        mockMvc.perform(get("/boards/save"))
+                .andDo(print())
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/login?redirectURL=/boards/save"));
+    }
+
+    @Test
     void 게시판_작성요청_성공() throws Exception {
-        AuthInfo authInfo = new AuthInfo(member.getId(), member.getNickname());
         mockMvc.perform(post("/boards/save")
                         .param("title", "제목")
                         .param("content", "내용")
@@ -89,8 +97,17 @@ class BoardControllerTest {
     }
 
     @Test
-    void 게시판_작성요청_실패() throws Exception {
-        AuthInfo authInfo = new AuthInfo(member.getId(), member.getNickname());
+    void 게시판_작성요청_실패_비로그인() throws Exception {
+        mockMvc.perform(post("/boards/save")
+                        .param("title", "제목")
+                        .param("content", "내용"))
+                .andDo(print())
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/login?redirectURL=/boards/save"));
+    }
+
+    @Test
+    void 게시판_작성요청_유효성_검증_실패() throws Exception {
         mockMvc.perform(post("/boards/save")
                         .param("title", "")
                         .param("content", "")
@@ -107,7 +124,6 @@ class BoardControllerTest {
     @Test
     void 게시판_수정화면() throws Exception {
         //given
-        AuthInfo authInfo = new AuthInfo(member.getId(), member.getNickname());
         PostSaveForm postSaveForm = new PostSaveForm("제목", "내용");
         Long boardId = boardService.saveBoard(member.getId(), postSaveForm);
         String url = "/boards/" + boardId + "/update";
@@ -123,9 +139,37 @@ class BoardControllerTest {
     }
 
     @Test
+    void 게시판_수정화면_비로그인() throws Exception {
+        //given
+        PostSaveForm postSaveForm = new PostSaveForm("제목", "내용");
+        Long boardId = boardService.saveBoard(member.getId(), postSaveForm);
+        String url = "/boards/" + boardId + "/update";
+
+        //when, then
+        mockMvc.perform(get(url))
+                .andDo(print())
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/login?redirectURL=/boards/" + boardId + "/update"));
+    }
+
+    @Test
+    void 게시판_수정화면_수정권한없음() throws Exception {
+        //given
+        AuthInfo another = new AuthInfo(0L, "다른작성자");
+        PostSaveForm postSaveForm = new PostSaveForm("제목", "내용");
+        Long boardId = boardService.saveBoard(member.getId(), postSaveForm);
+        String url = "/boards/" + boardId + "/update";
+
+        //when, then
+        mockMvc.perform(get(url)
+                        .sessionAttr(SessionConstants.AUTH_INFO, another))
+                .andDo(print())
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
     void 게시판_수정요청_성공() throws Exception {
         //given
-        AuthInfo authInfo = new AuthInfo(member.getId(), member.getNickname());
         PostSaveForm postSaveForm = new PostSaveForm("제목", "내용");
         Long boardId = boardService.saveBoard(member.getId(), postSaveForm);
         String url = "/boards/" + boardId + "/update";
@@ -142,9 +186,41 @@ class BoardControllerTest {
     }
 
     @Test
-    void 게시판_수정요청_실패() throws Exception {
+    void 게시판_수정요청_실패_비로그인() throws Exception {
         //given
-        AuthInfo authInfo = new AuthInfo(member.getId(), member.getNickname());
+        PostSaveForm postSaveForm = new PostSaveForm("제목", "내용");
+        Long boardId = boardService.saveBoard(member.getId(), postSaveForm);
+        String url = "/boards/" + boardId + "/update";
+
+        //when, then
+        mockMvc.perform(put(url)
+                        .param("title", "수정된 제목")
+                        .param("content", "수정된 내용"))
+                .andDo(print())
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/login?redirectURL=/boards/" + boardId + "/update"));
+    }
+
+    @Test
+    void 게시판_수정요청_실패_수정권한없음() throws Exception {
+        //given
+        AuthInfo another = new AuthInfo(0L, "다른작성자");
+        PostSaveForm postSaveForm = new PostSaveForm("제목", "내용");
+        Long boardId = boardService.saveBoard(member.getId(), postSaveForm);
+        String url = "/boards/" + boardId + "/update";
+
+        //when, then
+        mockMvc.perform(put(url)
+                        .param("title", "수정된 제목")
+                        .param("content", "수정된 내용")
+                        .sessionAttr(SessionConstants.AUTH_INFO, another))
+                .andDo(print())
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void 게시판_수정요청_유효성_검증_실패() throws Exception {
+        //given
         PostSaveForm postSaveForm = new PostSaveForm("제목", "내용");
         Long boardId = boardService.saveBoard(member.getId(), postSaveForm);
         String url = "/boards/" + boardId + "/update";
@@ -164,9 +240,8 @@ class BoardControllerTest {
     }
 
     @Test
-    void 게시판_삭제요청() throws Exception {
+    void 게시판_삭제요청_성공() throws Exception {
         //given
-        AuthInfo authInfo = new AuthInfo(member.getId(), member.getNickname());
         PostSaveForm postSaveForm = new PostSaveForm("제목", "내용");
         Long boardId = boardService.saveBoard(member.getId(), postSaveForm);
         String url = "/boards/" + boardId;
@@ -176,5 +251,33 @@ class BoardControllerTest {
                         .sessionAttr(SessionConstants.AUTH_INFO, authInfo))
                 .andDo(print())
                 .andExpect(status().isNoContent());
+    }
+
+    @Test
+    void 게시판_삭제요청_실패_비로그인() throws Exception {
+        //given
+        PostSaveForm postSaveForm = new PostSaveForm("제목", "내용");
+        Long boardId = boardService.saveBoard(member.getId(), postSaveForm);
+        String url = "/boards/" + boardId;
+
+        //when, then
+        mockMvc.perform(delete(url))
+                .andDo(print())
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    void 게시판_삭제요청_실패_삭제권한없음() throws Exception {
+        //given
+        AuthInfo another = new AuthInfo(0L, "다른작성자");
+        PostSaveForm postSaveForm = new PostSaveForm("제목", "내용");
+        Long boardId = boardService.saveBoard(member.getId(), postSaveForm);
+        String url = "/boards/" + boardId;
+
+        //when, then
+        mockMvc.perform(delete(url)
+                        .sessionAttr(SessionConstants.AUTH_INFO, another))
+                .andDo(print())
+                .andExpect(status().isForbidden());
     }
 }

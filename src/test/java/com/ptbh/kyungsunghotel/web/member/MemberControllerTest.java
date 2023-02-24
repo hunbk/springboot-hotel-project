@@ -32,12 +32,11 @@ class MemberControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
-    private Member member;
     private AuthInfo authInfo;
 
     @BeforeEach
     void setup() {
-        member = new Member(LOGIN_ID, PASSWORD, NAME, NICKNAME, EMAIL, CELLPHONE);
+        Member member = new Member(LOGIN_ID, PASSWORD, NAME, NICKNAME, EMAIL, CELLPHONE);
         memberRepository.save(member);
         authInfo = new AuthInfo(member.getId(), member.getNickname());
     }
@@ -123,7 +122,7 @@ class MemberControllerTest {
         mockMvc.perform(get("/account"))
                 .andDo(print())
                 .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/login"));
+                .andExpect(redirectedUrl("/login?redirectURL=/account"));
     }
 
     @Test
@@ -140,7 +139,7 @@ class MemberControllerTest {
     }
 
     @Test
-    void 회원정보_수정_권한없음() throws Exception {
+    void 회원정보_수정_실패_비로그인() throws Exception {
         mockMvc.perform(post("/account/update")
                         .param("name", "장영실")
                         .param("nickname", "jang")
@@ -148,7 +147,7 @@ class MemberControllerTest {
                         .param("cellPhone", "01012341234"))
                 .andDo(print())
                 .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/login"));
+                .andExpect(redirectedUrl("/login?redirectURL=/account/update"));
     }
 
     @Test
@@ -193,6 +192,17 @@ class MemberControllerTest {
                 .andDo(print())
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/account"));
+    }
+
+    @Test
+    void 비밀번호_변경_실패_비로그인() throws Exception {
+        mockMvc.perform(post("/account/change-password")
+                        .param("currentPassword", PASSWORD)
+                        .param("newPassword", "password12!@")
+                        .param("newPasswordCheck", "password12!@"))
+                .andDo(print())
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/login?redirectURL=/account/change-password"));
     }
 
     @Test
@@ -256,6 +266,15 @@ class MemberControllerTest {
                 .andDo(print())
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/"));
+    }
+
+    @Test
+    void 회원탈퇴_실패_비로그인() throws Exception {
+        mockMvc.perform(post("/account/withdraw")
+                        .param("password", PASSWORD))
+                .andDo(print())
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/login?redirectURL=/account/withdraw"));
     }
 
     @Test

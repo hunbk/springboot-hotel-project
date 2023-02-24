@@ -35,11 +35,9 @@ class AuthControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
-    private Member member;
-
     @BeforeEach
     void setup() {
-        member = new Member(LOGIN_ID, PASSWORD, NAME, NICKNAME, EMAIL, CELLPHONE);
+        Member member = new Member(LOGIN_ID, PASSWORD, NAME, NICKNAME, EMAIL, CELLPHONE);
         memberRepository.save(member);
     }
 
@@ -68,6 +66,17 @@ class AuthControllerTest {
                 .andExpect(handler().methodName("login"))
                 .andExpect(view().name("redirect:/"))
                 .andExpect(redirectedUrl("/"));
+    }
+
+    @Test
+    void 로그인_요청_성공_리다이렉트_url_존재() throws Exception {
+        mockMvc.perform(post("/login")
+                        .param("loginId", LOGIN_ID)
+                        .param("password", PASSWORD)
+                        .param("redirectURL", "/account"))
+                .andDo(print())
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/account"));
     }
 
     @Test
