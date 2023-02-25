@@ -22,7 +22,7 @@ public class WebConfig implements WebMvcConfigurer {
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(new AuthInterceptor())
                 .addPathPatterns("/**")
-                .excludePathPatterns("/", "/boards", "/boards/{id:\\d+}", "/members/{id:\\d+}",
+                .excludePathPatterns("/", "/api/**", "/boards", "/boards/{id:\\d+}", "/members/{id:\\d+}",
                         "/login", "/logout", "/join", "/css/**", "/img/**", "/*.ico", "/error");
     }
 
