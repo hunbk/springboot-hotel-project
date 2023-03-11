@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/html">
+<head th:replace="fragments/header :: header">
+    <title>reserveView</title>
+</head>
+<body class="d-flex flex-column min-vh-100">
+<nav th:replace="fragments/navbar :: navbar"></nav>
+
+<div class="container py-5" style="text-align: -webkit-center;">
+    <div class="card" style="text-align: -webkit-left;">
+        <div class="card-header">
+            <h4 class="text-center">예약</h4>
+        </div>
+        <form method="post">
+            <p>방 종류: <span th:text="${orderPageDto.roomType}"></span></p>
+            <input type="hidden" th:field="${orderPageDto.roomType}">
+            <p>체크인: <span th:text="${orderPageDto.checkIn}"></span></p>
+            <input type="hidden" th:field="${orderPageDto.checkIn}">
+            <p>체크아웃: <span th:text="${orderPageDto.checkOut}"></span></p>
+            <input type="hidden" th:field="${orderPageDto.checkOut}">
+            <p>인원: <span th:text="${orderPageDto.personnel}"></span>명</p>
+            <input type="hidden" th:field="${orderPageDto.personnel}">
+            <p>결재금액: <span th:text="${totalPrice}"></span>원</p>
+            <input type="hidden" id="totalPrice" name="totalPrice" th:value="${totalPrice}">
+
+            <input class="btn btn-primary" type="submit" value="결제하기">
+        </form>
+    </div>
+</div>
+<div th:replace="fragments/footer :: footer"></div>
+</body>
+</html>

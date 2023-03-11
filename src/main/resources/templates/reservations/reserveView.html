@@ -14,31 +14,31 @@
         <div class="card-body">
             <div style="display: flex;">
                 <label style="font-weight: bolder;">객실:&nbsp;</label>
-                <p th:text="${reserve.roomNo}"></p>
+                <p th:text="${reservation.roomNo}"></p>
             </div>
             <div style="display: flex;">
                 <label style="font-weight: bolder;">체크인:&nbsp;</label>
-                <p th:text="${reserve.checkIn}"></p>
+                <p th:text="${reservation.checkIn}"></p>
             </div>
             <div style="display: flex;">
                 <label style="font-weight: bolder;">체크아웃:&nbsp;</label>
-                <p th:text="${reserve.checkOut}"></p>
+                <p th:text="${reservation.checkOut}"></p>
             </div>
             <div style="display: flex;">
                 <label style="font-weight: bolder;">예약자:&nbsp;</label>
-                <p th:text="${reserve.name}"></p>
+                <p th:text="${reservation.name}"></p>
             </div>
             <div style="display: flex;">
                 <label style="font-weight: bolder;">인원:&nbsp;</label>
-                <p th:text="${reserve.personnel}"></p>
+                <p th:text="${reservation.personnel}"></p>
             </div>
             <div style="display: flex;">
                 <label style="font-weight: bolder;">결제 금액:&nbsp;</label>
-                <p th:text="${reserve.reservePrice}"></p>
+                <p th:text="${reservation.reservePrice}"></p>
             </div>
             <div style="text-align: end; margin: 20px;">
                 <button type="button" class="btn btn-outline-secondary" onclick="location.href='/account';" >마이페이지</button>
-                <button type="button" class="btn btn-dark" th:onclick="|location.href='@{/reserve/reserveDelete/{id}(id=${reserve.id})}'|">예약 취소</button>
+                <button type="button" class="btn btn-dark" th:onclick="|location.href='@{/reservation/reserveDelete/{id}(id=${reservation.id})}'|">예약 취소</button>
             </div>
         </div>
     </div>

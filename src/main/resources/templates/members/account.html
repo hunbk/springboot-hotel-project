@@ -31,17 +31,19 @@
             <table class="table table-hover">
                 <thead>
                 <tr>
+                    <th scope="col">id</th>
                     <th scope="col">객실</th>
                     <th scope="col">체크인</th>
                     <th scope="col">체크아웃</th>
-                    <th scope="col">예약자</th>
+                    <th scope="col">인원</th>
                 </tr>
                 </thead>
-                <tr scope="row" th:each="reserve : ${reserves}">
-                    <td><a th:href="@{/reserve/{id}(id=${reserve.id})}" th:text="${reserve.roomNo}"></a></td>
-                    <td th:text="${reserve.checkIn}"></td>
-                    <td th:text="${reserve.checkOut}"></td>
-                    <td th:text="${reserve.name}"></td>
+                <tr scope="row" th:each="reservation : ${reservations}">
+                    <td th:text="${reservation.id}"></td>
+                    <td th:text="${reservation.roomType.getName()}"></td>
+                    <td th:text="${reservation.checkIn}"></td>
+                    <td th:text="${reservation.checkOut}"></td>
+                    <td th:text="${reservation.personnel}"></td>
                 </tr>
             </table>
         </div>

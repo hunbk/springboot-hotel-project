@@ -1,13 +1,18 @@
 package com.ptbh.kyungsunghotel.domain.member;
 
+import com.ptbh.kyungsunghotel.domain.reservation.Reservation;
 import com.ptbh.kyungsunghotel.exception.member.NoSuchMemberException;
 import com.ptbh.kyungsunghotel.web.member.ChangePasswordForm;
 import com.ptbh.kyungsunghotel.web.member.JoinForm;
 import com.ptbh.kyungsunghotel.web.member.JoinResponse;
 import com.ptbh.kyungsunghotel.web.member.MemberUpdateForm;
+import com.ptbh.kyungsunghotel.web.reservation.ReservationDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -47,6 +52,14 @@ public class MemberService {
                 memberUpdateForm.getCellPhone()
         );
     }
+
+    //N+1 발생 로직
+//    public List<ReservationDto> getReservationsByMemberId(Long memberId) {
+//        Member member = memberRepository.findById(memberId).orElseThrow(NoSuchMemberException::new);
+//        return member.getReservations().stream()
+//                .map(ReservationDto::from)
+//                .collect(Collectors.toList());
+//    }
 
     @Transactional
     public void changePassword(Long memberId, ChangePasswordForm changePasswordForm) {

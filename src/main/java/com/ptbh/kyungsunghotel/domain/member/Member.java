@@ -1,7 +1,7 @@
 package com.ptbh.kyungsunghotel.domain.member;
 
 import com.ptbh.kyungsunghotel.domain.board.Board;
-import com.ptbh.kyungsunghotel.domain.reserve.Reserve;
+import com.ptbh.kyungsunghotel.domain.reservation.Reservation;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -47,8 +47,9 @@ public class Member {
     @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE)
     private List<Board> boards = new ArrayList<>();
 
-    @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE)
-    private List<Reserve> reserves = new ArrayList<>();
+    //양방향 매핑
+//    @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE)
+//    private List<Reservation> reservations = new ArrayList<>();
 
     public Member(String loginId, String password, String name, String nickname, String email, String cellPhone) {
         this.loginId = loginId;

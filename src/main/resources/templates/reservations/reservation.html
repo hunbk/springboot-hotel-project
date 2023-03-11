@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/html">
+<head th:replace="fragments/header :: header">
+    <title>reservation</title>
+</head>
+<body class="d-flex flex-column min-vh-100">
+<nav th:replace="fragments/navbar :: navbar"></nav>
+
+<div class="container">
+    <div style="padding: 10px; text-align: center;">
+        <h3><a style="text-decoration: none;">예약</a></h3>
+    </div>
+    <form id="roomSearchForm" method="post">
+        <div class="card " style="height: 100px; text-align: center; margin: auto;">
+            <div class="d-flex justify-content-around" style="margin-block: auto;">
+                <div class="d-flex flex-column bd-highlight mb-3">
+                    <label class="card-text" for="checkIn">체크인</label>
+                    <input class="card-text" type="date" id="checkIn" name="checkIn" required="required">
+                </div>
+                <div class="d-flex flex-column bd-highlight mb-3">
+                    <label class="card-text" for="checkOut">체크아웃</label>
+                    <input class="card-text" type="date" id="checkOut" name="checkOut" required="required">
+                </div>
+                <div class="d-flex flex-column bd-highlight mb-3">
+                    <label class="card-text" for="personnel">인원</label>
+                    <select class="form-select" id="personnel" name="personnel" required="required" style="width: 85px; height: fit-content; margin-block: auto;">
+                        <option value="1">1</option>
+                        <option value="2" selected>2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                    </select>
+                </div>
+                <input class="btn btn-dark" type="submit" value="객실 조회" style="align-self: center;">
+            </div>
+        </div>
+    </form>
+
+    <div class="row row-cols-1 row-cols-md-3 g-4 mt-3 mb-5" id="roomResult">
+    </div>
+
+</div>
+<div th:replace="fragments/footer :: footer"></div>
+<script type="text/javascript">
+    let checkIn = document.getElementById('checkIn');
+    let checkOut = document.getElementById('checkOut');
+    let personnel = document.getElementById('personnel');
+
+    function setToday() {
+        let today = new Date();
+        let tomorrow = new Date();
+        tomorrow.setDate(today.getDate() + 1);
+
+        checkIn.value = today.toISOString().substring(0, 10);
+        checkOut.value = tomorrow.toISOString().substring(0, 10);
+        checkIn.setAttribute('min', checkIn.value)
+        checkOut.setAttribute('min', checkOut.value);
+
+        let maxDate = new Date();
+        maxDate.setDate(maxDate.getDate() + 10);
+        checkOut.setAttribute('max', maxDate.toISOString().substring(0, 10));
+    }
+
+    function setCheckOut() {
+        let checkInDate = new Date(checkIn.value);
+        let checkOutDate = new Date(checkIn.value);
+        checkOutDate.setDate(checkInDate.getDate() + 1);
+
+        let minValue = checkOutDate.toISOString().substring(0, 10);
+
+        //숙박일수 10일로 제한
+        let maxDate = new Date(checkIn.value);
+        maxDate.setDate(checkInDate.getDate() + 9);
+        let maxValue = maxDate.toISOString().substring(0, 10);
+
+        checkOut.value = minValue;
+        checkOut.setAttribute('min', minValue);
+        checkOut.setAttribute('max', maxValue);
+    }
+
+    checkIn.addEventListener('change', () => setCheckOut())
+
+
+
+    async function searchRooms() {
+        const params = new URLSearchParams();
+        params.append('checkIn', checkIn.value);
+        params.append('checkOut', checkOut.value);
+        params.append('personnel', personnel.value);
+
+        // 체크인, 체크아웃 날짜, 인원으로 fetch
+        let rooms = await fetch('/api/rooms/reservable?' + params.toString())
+            .then(response => response.json())
+            .then(response => response.data);
+        return rooms;
+    }
+
+    function changeRoomResult(rooms) {
+        let roomResult = document.getElementById('roomResult');
+        roomResult.innerHTML = '';
+
+        for(const room of rooms) {
+            let roomElement = createElement(room);
+            roomResult.appendChild(roomElement);
+        };
+    }
+
+    function createElement(room) {
+        let root = document.createElement('div');
+        root.setAttribute('class', 'col')
+
+        let card = document.createElement('div');
+        card.setAttribute('class', 'card');
+
+        let img = document.createElement('img');
+        img.setAttribute('class', 'card-img-top');
+        img.src = '/img/' + room.photoUrl;
+
+        let cardBody = document.createElement('div');
+        cardBody.setAttribute('class', 'card-body');
+
+        let roomName = document.createElement('h5');
+        roomName.setAttribute('class', 'card-title');
+        roomName.innerText = room.roomTypeName;
+
+        let price = document.createElement('p');
+        price.setAttribute('class', 'card-text');
+        price.innerText = room.price + '원(1박 기준)';
+
+        let button = document.createElement('button');
+        button.setAttribute('class', 'btn btn-primary');
+        button.innerText = '예약하기';
+
+        //주문으로 이동
+        button.addEventListener('click', () => {
+            let params = new URLSearchParams();
+            params.append('roomType', room.roomType);
+            params.append('checkIn', room.checkIn);
+            params.append('checkOut', room.checkOut);
+            params.append('personnel', room.personnel);
+            location.href = '/orders/new?' + params.toString();
+        });
+
+        cardBody.appendChild(roomName);
+        cardBody.appendChild(price);
+        cardBody.appendChild(button);
+        card.appendChild(img);
+        card.appendChild(cardBody);
+        root.appendChild(card);
+        return root;
+    }
+
+    let roomSearchForm = document.getElementById('roomSearchForm');
+    roomSearchForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        let rooms = await searchRooms();
+        changeRoomResult(rooms);
+    });
+
+    //오늘로 설정
+    setToday();
+
+</script>
+</body>
+</html>

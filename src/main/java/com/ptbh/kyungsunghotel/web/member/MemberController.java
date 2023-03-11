@@ -4,15 +4,12 @@ import com.ptbh.kyungsunghotel.domain.auth.AuthInfo;
 import com.ptbh.kyungsunghotel.domain.board.BoardDto;
 import com.ptbh.kyungsunghotel.domain.board.BoardService;
 import com.ptbh.kyungsunghotel.domain.member.MemberDto;
-import com.ptbh.kyungsunghotel.domain.member.MemberRepository;
 import com.ptbh.kyungsunghotel.domain.member.MemberService;
-import com.ptbh.kyungsunghotel.domain.reserve.Reserve;
-import com.ptbh.kyungsunghotel.domain.reserve.ReserveRepository;
-import com.ptbh.kyungsunghotel.domain.reserve.ReserveService;
+import com.ptbh.kyungsunghotel.domain.reservation.ReservationService;
 import com.ptbh.kyungsunghotel.exception.member.NoSuchMemberException;
 import com.ptbh.kyungsunghotel.web.SessionConstants;
 import com.ptbh.kyungsunghotel.web.auth.Login;
-import com.ptbh.kyungsunghotel.web.reserve.ReserveForm;
+import com.ptbh.kyungsunghotel.web.reservation.ReservationDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -30,19 +27,17 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @Controller
 @RequiredArgsConstructor
 public class MemberController {
-    private final MemberRepository memberRepository;
-    private final ReserveRepository reserveRepository;
+
     private final MemberService memberService;
     private final BoardService boardService;
+    private final ReservationService reservationService;
 
     @GetMapping("/join")
     public String joinForm(Model model) {
@@ -98,26 +93,15 @@ public class MemberController {
     public String account(@SessionAttribute(name = SessionConstants.AUTH_INFO, required = false) AuthInfo authInfo,
                           Model model) {
 
-        List<Reserve> reserves = memberRepository.findById(authInfo.getId()).orElse(null).getReserves();
-        List<ReserveForm> list = new ArrayList<>();
+        //객체 그래프 탐색. N+1 발생
+//        List<ReservationDto> reservations = memberService.getReservationsByMemberId(authInfo.getId());
 
-        reserves = reserves.stream().filter(ReserveService.distinctByKey(Reserve::getReserveId)).collect(Collectors.toList());
-        for (Reserve reserve : reserves) {
-            ReserveForm reserveForm = new ReserveForm();
-            reserveForm.setId(reserve.getId());
-            reserveForm.setCheckIn(reserve.getDate());
-            //TODO: 잘못된 설계. 예약 도메인 리팩토링 필요.
-            reserveForm.setCheckOut(reserve.getDate().plusDays(reserveRepository.countByReserveId(reserve.getReserveId())));
-            reserveForm.setRoomNo(reserve.getRoom().getRoomNo());
-            reserveForm.setName(reserve.getMember().getName());
-            reserveForm.setPersonnel(reserve.getPersonnel());
-            reserveForm.setReservePrice(reserve.getReservePrice());
-            list.add(reserveForm);
-        }
+        //jpql fetch join 사용
+        List<ReservationDto> reservations = reservationService.findAllByMemberId(authInfo.getId());
 
         MemberDto memberDto = memberService.findByMemberId(authInfo.getId());
         model.addAttribute("memberDto", memberDto);
-        model.addAttribute("reserves", list);
+        model.addAttribute("reservations", reservations);
         return "members/account";
     }
 
